@@ -1,137 +1,134 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-import tkinter as tk
-from tkinter import TclError, ttk
-import tkinter as tk
+import PySimpleGUI
 from ast import literal_eval
 import numpy
+import json
+import matplotlib
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+matplotlib.use("TkAgg")
+back=False
 switch=False
+fig=None
 ax=None
 gen=None
+line=None
 wframe = None
+index=0
+x=[]
+y=[]
+z=[]
 
 def read_data(path):
-    file=open(path)
-    #data=literal_eval(file.read())
-    data=literal_eval(file.read())
-    arr=list(data)
-    print(type(arr),data[0], data[1], data[2])
-    return arr
+    with open(path) as file:
+        data=json.load(file)
+        return data
 
 def create_figure():
     print("create figure")
+    global fig
     global ax
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-
-    # Set the z axis limits, so they aren't recalculated each frame.
     ax.set_zlim(-1, 1)
 
-    # Begin plotting.
-    
-    return ax
-def gen_gen(data_objects):
-    global switch
-    global ax
-    global gen
-    # Make the X, Y meshgrid.    
-    #xs = np.linspace(-1, 1, 50)
-    #ys = np.linspace(-1, 1, 50)
-    #X, Y = np.meshgrid(xs, ys)
-    gen  = next_value(data_objects)
 
 def run_figure():
     print("run figure", switch)
     global gen
-    global wframe
+    global ax
+    global index
+    global line
     
     if switch:
-        if wframe:
-            wframe.remove()
+        #if wframe:
+        #    wframe.remove()
         #calls the next item of generator
-        wframe = next(gen)
+        data_object = next(gen)
+        x.append(data_object[0][0])
+        y.append(data_object[0][1])
+        z.append(data_object[0][2])
+        #sache mit den Quadern fehlt noch...
+        line,=ax.plot(x,y,z, marker="o", linestyle="dashed", markersize=2)
+        index+=1
         plt.pause(1.00)
 
 
-def next_value(data_objects):
-    # Generate data.
-    print(data_objects)
-    for data_object in data_objects:
-        data_string=numpy.array(data_object)
-        print(data_string)
-        #try: 
-        data=(data_string)
-        # Plot the new wireframe and pause briefly before continuing.
-        x,y,z= data[0], data[1], data[2]
-        print("PLOT", x,y,z)
-        yield ax.plot(x,y,z)
-        #except:
-            #data=numpy.array(literal_eval(data_string))
-            # Plot the new wireframe and pause briefly before continuing.
-            #x,y,z= data[0], data[1], data[2]
-            #yield ax.voxels(data[0:8])
-        #    print("NONE")
-        #    yield None
+def back():# auch generator drauß machen...?
+    global index
+    global fig
+    global line
+    print("try")
+    try:
+        xvals = x[:index-2]
+        yvals = y[:index-2]
+        zvals = z[:index-2]
+        line.set_data_3d(xvals,yvals,zvals)
+        fig.canvas.draw_idle()
+    except Exception as e:
+        print(e)
+        pass
 
+
+
+def next_value(data_objects):
+    global back
+    for i in range(len(data_objects)):
+        try:
+            yield data_objects[i]
+
+        except StopIteration:
+            break
 
             
-
 def pause_figure():
     global switch
     switch=not switch
 
 
-
-def create_button_frame(container):
-    global ax
-    frame = ttk.Frame(container)
-
-    frame.columnconfigure(0, weight=1)
-
-    ttk.Button(frame, text='Play', command=run_figure).grid(column=0, row=0)
-    ttk.Button(frame, text='Play/Pause', command=pause_figure).grid(column=0, row=1)
-
-
-    for widget in frame.winfo_children():
-        widget.grid(padx=5, pady=5)
-
-    return frame
-
+def draw_figure(canvas, figure):
+    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
+    figure_canvas_agg.draw()
+    figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
+    return figure_canvas_agg
 
 def create_main_window(data_objects):
-    global ax
-    root = tk.Tk()
-    root.title('3D Result Player')
-    root.resizable(0, 0)
-    #try:
-    #    # windows only (remove the minimize/maximize button)
-    #    root.attributes('-toolwindow', True)
-    #except TclError:
-    #    print('Not supported on your platform')
-
-    # layout on the root window
-    root.columnconfigure(0, weight=1)
-    root.columnconfigure(1, weight=1)
-
+    global fig
+    global switch
     create_figure()
-    ax.grid(column=1, row=0)
-    
-    button_frame = create_button_frame(root)
-    button_frame.grid(column=0, row=0)
-    gen_gen(data_objects)
+    play_button = PySimpleGUI.Button('Play/Pause')
+    back_button = PySimpleGUI.Button('<')
+    root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[back_button, play_button]], finalize=True)
+    draw_figure(root["-CANVAS-"].TKCanvas, fig)
 
-    def nextframe():
-        run_figure()
-        root.after(1000, nextframe)
-    root.after(1000, nextframe)
-    #run_figure(ax)
+    while True:
+        event, values = root.read(timeout=1000)
+        # End program if user closes window or
+        # presses the OK button
+        if event == PySimpleGUI.WIN_CLOSED:
+            break
+        if event == "Play/Pause":
+            pause_figure()
+        if event == "<":
+            switch=False
+            back()
 
-    root.mainloop()
+        if switch:
+            run_figure()
+
+    root.close()
+
+    #root.mainloop()
 
 
 if __name__ == "__main__":
-    path="/home/michelle/real/3d_player/plot_tests/1_mini.txt"
+    path="/home/michelle/real/3d_player/plot_tests/modified.txt"
     data_objects=read_data(path)
+    data_objects=data_objects['data']
+    gen  = next_value(data_objects)
+    print(next(gen))
+    print(next(gen))
+
     create_main_window(data_objects)
