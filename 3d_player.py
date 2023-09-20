@@ -21,6 +21,7 @@ class Three_Dimensional_Player:
         self.fig=None
         self.ax=None
         self.gen=None
+        self.figure_canvas_agg=None
         
         self.x=[]
         self.y=[]
@@ -31,25 +32,26 @@ class Three_Dimensional_Player:
         self.tmp_index=0
         play_button = PySimpleGUI.Button('Play/Pause')
         back_button = PySimpleGUI.Button('<')
-        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[back_button, play_button]], finalize=True)
+        forward_button = PySimpleGUI.Button('>')
+        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[back_button, play_button, forward_button]], finalize=True)
         self.create_figure()
-        self.figure_canvas_agg=self.draw_figure(self.root["-CANVAS-"].TKCanvas, self.fig)
+        #self.figure_canvas_agg=
+        self.draw_figure()
 
-    def draw_figure(self, canvas, figure):
-        figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
-        figure_canvas_agg.draw()
-        figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
-        return figure_canvas_agg
+    def draw_figure(self):
+        self.figure_canvas_agg = FigureCanvasTkAgg(self.fig, self.root["-CANVAS-"].TKCanvas)
+        self.figure_canvas_agg.draw()
+        self.figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
+
 
     def create_figure(self):
         self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(projection='3d')
+        self.ax = self.fig.add_subplot(projection='3d') #ax is a subplot
         self.ax.set_zlim(-1, 1)
 
 
     def plot_actual_data(self):
-        #forget? self.fig.get_tk_widget
-        self.ax.cla()
+        self.ax.cla() #clear ax
         self.line=Line3D(self.x[:self.tmp_index],self.y[:self.tmp_index],self.z[:self.tmp_index])
         plot_data=self.line.get_data_3d()
         self.ax.plot(plot_data[0], plot_data[1],  plot_data[2],marker="o", markersize=5)
@@ -68,22 +70,23 @@ class Three_Dimensional_Player:
             
             self.plot_actual_data()
             self.tmp_index+=1
-            
-            plt.pause(1.00)
 
 
-    def backwarts(self):# auch generator drauß machen...?
-        print("try")
+
+    def backwards(self):
         if self.tmp_index>0:
-            try:
-                self.tmp_index=self.tmp_index-1
- 
-                self.plot_actual_data()
-                
-            except Exception as e:
-                print(e)
-                pass
-
+            self.tmp_index=self.tmp_index-1
+            self.plot_actual_data()
+    
+    def forwards(self):
+        if self.tmp_index<self.index:
+            self.tmp_index=self.tmp_index+1
+            self.plot_actual_data()
+        else:
+            tmp=self.switch
+            self.switch=True
+            self.run_figure()
+            self.switch=tmp
 
 
     def next_value(self,data_objects):
@@ -111,14 +114,17 @@ class Three_Dimensional_Player:
                 self.pause_figure()
             if event == "<":
                 self.switch=False
-                self.backwarts()
+                self.backwards()
+
+            if event == ">":
+                self.switch=False
+                self.forwards()
 
             if self.switch:
                 self.run_figure()
 
         self.root.close()
 
-        #root.mainloop()
 
 
 if __name__ == "__main__":
