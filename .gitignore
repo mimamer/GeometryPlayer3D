@@ -1,4 +1,5 @@
-./test_data/*
+./project/test_data/*
 *.csv
-./source/__pycache__/*
-./unit_tets/__pycache__/*
+./project/source/__pycache__/*
+./project/unit_tets/__pycache__/*
+./project/__pycache__/*

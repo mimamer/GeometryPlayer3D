@@ -31,12 +31,32 @@ class CurveManager:
             return
         print("FORCE NEW BOUNDS")
         #TODO:Cuboid may be not that optimal regarding usability, may change something here
-        max_abs_x,meaning_x=self.curves[self.chosen_curve].get_max_abs_value_x_axis()
-        max_abs_y,meaning_y=self.curves[self.chosen_curve].get_max_abs_value_y_axis()
-        max_abs_z,meaning_z=self.curves[self.chosen_curve].get_max_abs_value_z_axis()
+        max_abs_value_x,meaning_x=self.curves[self.chosen_curve].get_max_abs_value_x_axis()
+        max_abs_value_y,meaning_y=self.curves[self.chosen_curve].get_max_abs_value_y_axis()
+        max_abs_value_z,meaning_z=self.curves[self.chosen_curve].get_max_abs_value_z_axis()
+
+        max_abs_value=0
+        meaning="*"
+        axis=-1
+        if abs(max_abs_value_x)>abs(max_abs_value_y) and abs(max_abs_value_x)>abs(max_abs_value_z):
+            max_abs_value=max_abs_value_x
+            meaning=meaning_x
+            axis=0
+        elif abs(max_abs_value_y)>abs(max_abs_value_x) and abs(max_abs_value_y)>abs(max_abs_value_z):
+            max_abs_value=max_abs_value_y
+            meaning=meaning_y
+            axis=1
+        elif abs(max_abs_value_z)>abs(max_abs_value_x) and abs(max_abs_value_z)>abs(max_abs_value_y):
+            max_abs_value=max_abs_value_z
+            meaning=meaning_z
+            axis=2
+
+        #Try to zoom only in one dimension 
+        # take the max abs value of the three axis, the others will be incrememted by one, such that they will not filter values -> not fast enough
+        # sort only after the biggest axis
 
         for curve in self.curves:
-            curve.set_plot_data_to_cuboid(max_abs_x,meaning_x,max_abs_y,meaning_y,max_abs_z,meaning_z)
+            curve.set_plot_data_to_cuboid(max_abs_value,meaning,axis)
         print("FORCE NEW BOUNDS--END")
 
     def forwards(self):

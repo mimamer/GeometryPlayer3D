@@ -12,15 +12,14 @@ class Curve:
         self.plot_data=[self.x[:tmp_index],self.y[:tmp_index],self.z[:tmp_index] ]
 
     def adjust_data_points_for_zoom(self, lim_x,lim_y,lim_z):
-        print("ADJUST")
         xvals=[]
         yvals=[]
         zvals=[]
-        print("BOUNDARIES", lim_x,lim_y,lim_z)
+
         for i in range(len(self.z)):
-            if self.x[i]>=lim_x[0] and self.x[i]<=lim_x[1]:
-                if self.y[i]>=lim_y[0] and self.y[i]<=lim_y[1]:
-                    if self.z[i]>=lim_z[0] and self.z[i]<=lim_z[1]:
+            if self.x[i]>=lim_x[0] and self.x[i]<=lim_x[1] \
+                and self.y[i]>=lim_y[0] and self.y[i]<=lim_y[1] \
+                and self.z[i]>=lim_z[0] and self.z[i]<=lim_z[1]:
                         xvals.append(self.x[i])
                         yvals.append(self.y[i])
                         zvals.append(self.z[i])
@@ -67,18 +66,14 @@ class Curve:
         return self.get_max_abs_value(2)
     
 
-    def set_plot_data_to_cuboid(self,max_abs_x,meaning_x,max_abs_y,meaning_y,max_abs_z,meaning_z):
-        print("KURVE HAT DATEN ERHALTEN:",max_abs_x,meaning_x,max_abs_y,meaning_y,max_abs_z,meaning_z)
-        check_data_point_in_x_interval=set_compare_function(meaning_x)
-        check_data_point_in_y_interval=set_compare_function(meaning_y)
-        check_data_point_in_z_interval=set_compare_function(meaning_z)
+    def set_plot_data_to_cuboid(self,max_abs_value,meaning,axis):
+        print("KURVE HAT DATEN ERHALTEN:",max_abs_value,meaning,axis)
+        check_data_point_in_axis_interval=set_compare_function(meaning)
         xvals=[]
         yvals=[]
         zvals=[]
         for i in range(len(self.plot_data[0])):
-            if not check_data_point_in_x_interval(self.plot_data[0][i],max_abs_x) \
-                or not check_data_point_in_y_interval(self.plot_data[1][i],max_abs_y) \
-                or not check_data_point_in_z_interval(self.plot_data[2][i],max_abs_z):##TODO: killt natürlich richtiges rauszoomen...
+            if not check_data_point_in_axis_interval(self.plot_data[axis][i],max_abs_value):##TODO: killt natürlich richtiges rauszoomen...
                 continue
             xvals.append(self.plot_data[0][i])
             yvals.append(self.plot_data[1][i])
