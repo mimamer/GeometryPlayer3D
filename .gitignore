@@ -1,2 +1,2 @@
-plot_tests/*
+./test_data/*
 *.csv
