@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import PySimpleGUI
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from source.Three_Dimensional_Curve import Three_Dimensional_Curve
-from source.Curve_Manager import Curve_Manager
-from source.Button_Event import Button_Event
+from source.curve import Curve
+from source.curvemanager import CurveManager
+from source.buttonevent import ButtonEvent
 
 from matplotlib.backend_bases import MouseButton
 
@@ -12,11 +12,11 @@ matplotlib.use("TkAgg")
 import warnings
 warnings.filterwarnings("error")
 
-from source.player_utils import get_new_lims
+from source.utils import get_new_lims
 
 
 #dynamisch mit rein tun, falls wert schon da nimm diesen....
-class Three_Dimensional_Player:
+class GraphAnimator3D:
     def __init__(self,data_objects):
         
         self.switch=False
@@ -25,9 +25,9 @@ class Three_Dimensional_Player:
         self.figure_canvas_agg=None
         self.margins=None
 
-        curves=[Three_Dimensional_Curve(data_objects)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Curve(data_objects)]#later three_dimensional_player will not receive data_objects for curve this way
 
-        self.curve_manager=Curve_Manager(curves)
+        self.curve_manager=CurveManager(curves)
         self.previous_lim_change=None
 
         button_list=self.register_button_events()
@@ -145,11 +145,11 @@ class Three_Dimensional_Player:
         self.switch=not self.switch
 
     def register_button_events(self):
-        self.events=[Button_Event("<",self.backwards),
-                Button_Event("Play/Pause",self.press_switch),
-                Button_Event(">",self.forwards),
-                Button_Event("+",self.zoom_in),
-                Button_Event("-",self.zoom_out)]
+        self.events=[ButtonEvent("<",self.backwards),
+                ButtonEvent("Play/Pause",self.press_switch),
+                ButtonEvent(">",self.forwards),
+                ButtonEvent("+",self.zoom_in),
+                ButtonEvent("-",self.zoom_out)]
         button_list=[]
         for event in self.events:
             button_list.append(event.get_button())

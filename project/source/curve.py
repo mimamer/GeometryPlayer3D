@@ -1,6 +1,6 @@
-from source.player_utils import set_compare_function
+from source.utils import set_compare_function
 
-class Three_Dimensional_Curve:
+class Curve:
     def __init__(self, data_objects):
         self.plot_data=None
         self.x=[]

@@ -1,10 +1,10 @@
 import unittest
-from source.Curve_Manager import Curve_Manager
+from source.curvemanager import CurveManager
 
 class Curve_Manager_module_Tester(unittest.TestCase):
 
     def test_init_with_none(self):
-        curve_manager=Curve_Manager(None)
+        curve_manager=CurveManager(None)
         self.assertEqual(curve_manager.curves, [])
 
 

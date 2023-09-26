@@ -1,5 +1,5 @@
 from PySimpleGUI import Button
-class Button_Event:
+class ButtonEvent:
     def __init__(self,event_name,command):
         self.event_name=event_name
         self.command=command

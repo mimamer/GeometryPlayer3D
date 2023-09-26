@@ -1,2 +1,4 @@
 ./test_data/*
 *.csv
+./source/__pycache__/*
+./unit_tets/__pycache__/*

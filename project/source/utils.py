@@ -1,3 +1,10 @@
+import json
+
+def read_data(path):
+    with open(path) as file:
+        data=json.load(file)
+        return data
+
 def get_new_lims(lim_tuple):#problems when diff is very small
     diff=lim_tuple[1]-lim_tuple[0]
     diff=diff/10

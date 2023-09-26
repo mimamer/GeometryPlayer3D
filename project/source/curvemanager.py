@@ -1,7 +1,7 @@
-from source.Three_Dimensional_Curve import Three_Dimensional_Curve
+from source.curve import Curve
 
-class Curve_Manager:
-    def __init__(self,curves : list[Three_Dimensional_Curve] = None):
+class CurveManager:
+    def __init__(self,curves : list[Curve] = None):
         
         self.chosen_curve=0
         self.chosen_point=0
