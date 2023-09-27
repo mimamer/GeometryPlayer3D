@@ -14,10 +14,13 @@ warnings.filterwarnings("error")
 
 from source.utils import get_new_lims
 
+#import mpl_toolkits
+#from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
 
 #dynamisch mit rein tun, falls wert schon da nimm diesen....
 class GraphAnimator3D:
-    def __init__(self,data_objects):
+    def __init__(self,data_objects, data_objects2):
         
         self.switch=False
         self.fig=None
@@ -25,16 +28,19 @@ class GraphAnimator3D:
         self.figure_canvas_agg=None
         self.margins=None
 
-        curves=[Curve(data_objects)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Curve(data_objects),Curve(data_objects2)]#later three_dimensional_player will not receive data_objects for curve this way
+        length_data_objects=len(data_objects)
+        self.length_plot_window=length_data_objects
+        self.create_colors()
 
         self.curve_manager=CurveManager(curves)
         self.previous_lim_change=None
 
         button_list=self.register_button_events()
-        
         self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],button_list], finalize=True)
         self.create_figure()
         self.draw_figure()
+        self.register_mouse_events()
 
 
     def draw_figure(self):
@@ -64,11 +70,35 @@ class GraphAnimator3D:
         self.curve_manager.adjust_data_points_for_zoom(lim_x,lim_y,lim_z)
         self.plot_curves_actual_plot_data()
 
+    def create_colors(self):
+            self.colors=[]
+            for cmap in ['Greys','Greens','Purples','Oranges']:#TODO:limits number of curves that can be visualized
+                cmap=plt.get_cmap(cmap)
+                colo=[]
+                cmap_usable=int(cmap.N/3)
+                col_abs=(cmap.N-cmap_usable)/self.length_plot_window # hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
+                i=0
+                while i*col_abs<=cmap.N-cmap_usable:
+                    rgba=cmap(cmap_usable+int(i*col_abs))
+                    colo.append(matplotlib.colors.rgb2hex(rgba))
+                    i+=1
+                self.colors.append(colo)
     def plot_curves_actual_plot_data(self):
         self.ax.cla() #clear ax
-        for index in range(len(self.curve_manager.curves)):
+        
+        # lc = mcoll.LineCollection(segments, array=z, cmap=cmap, norm=norm,
+        #                      linewidth=linewidth, alpha=alpha)
+
+        for index in range(len(self.curve_manager.curves)):#cuboids has to be added seperately... see cuboids.py
             curve_plot_data=self.curve_manager.get_curve_data(index)
-            self.ax.plot(curve_plot_data[0], curve_plot_data[1],  curve_plot_data[2],marker="o", markersize=5)
+
+
+            #TODO:only for testing, this is not pretty
+            if index<len(self.curve_manager.curve_plot):
+                #also changes ax.plot
+                self.curve_manager.curve_plot[index]=self.ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False, c=self.colors[index][:len(curve_plot_data[0])])#could use 3dline?
+            else:#curve is not registered in plot data
+                self.curve_manager.curve_plot.append(self.ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False,c=self.colors[index][:len(curve_plot_data[0])]))
         self.ax.use_sticky_edges=False # can not zoom in adequately
         self.ax.margins(self.margins[0],self.margins[1],self.margins[2])
         self.figure_canvas_agg.draw_idle()
@@ -160,8 +190,7 @@ class GraphAnimator3D:
             if self_event.event_name==event:
                 self_event.trigger_command()
 
-    def create_main_window(self):
-
+    def register_mouse_events(self):
         #binding_id = plt.connect('motion_notify_event', on_move)
         plt.connect('button_press_event', on_click)
         def on_press(event):
@@ -170,13 +199,21 @@ class GraphAnimator3D:
                 self.zoom_in()
             elif event.button=="down":
                 self.zoom_out()
-            print('you pressed', event.button, event.xdata, event.ydata, event.x, event.y,self.ax.format_coord(None,None))
+            pressed = self.ax.button_pressed
+            self.ax.button_pressed = -1 # some value that doesn't make sense.
+            coords = self.ax.format_coord(event.xdata, event.ydata) # coordinates string in the form x=value, y=value, z= value
+            print("pressed, coords",coords)
+            self.ax.button_pressed = pressed
+            print('you pressed', event.button, event.xdata, event.ydata, event.x, event.y,self.ax.format_coord(event.x,event.y),self.ax.format_coord(event.xdata,event.ydata))
             
+            print("mouseevent occured on the line", self.curve_manager.choose_curve(event))
         plt.connect('scroll_event', on_press)
         plt.connect('button_press_event', on_press)
 
+    def create_main_window(self):
+
         while True:
-            event, values = self.root.read(timeout=1000)
+            event, values = self.root.read(timeout=500)
 
             if event == PySimpleGUI.WIN_CLOSED:
                 break
@@ -186,6 +223,7 @@ class GraphAnimator3D:
 
         self.root.close()
 
+
 def on_move(event):
     if event.inaxes:
         print(f'data coords {event.xdata} {event.ydata} {event.zdata},',
@@ -193,5 +231,3 @@ def on_move(event):
 def on_click(event):
     if event.button is MouseButton.MIDDLE:
         print('hi')
-
-

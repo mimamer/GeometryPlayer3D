@@ -37,3 +37,23 @@ def set_compare_function(meaning):
         return greater_compare
     else:
         raise Exception("unknown meaning string", meaning)
+    
+#example set
+def open_dataobjects():
+    path="/home/michelle/real/3d_player/project/test_data/modified.txt"
+    data_objects=read_data(path)
+    data_objects=data_objects['data']
+    return data_objects
+
+def open_dataobjects_minus():
+    path="/home/michelle/real/3d_player/project/test_data/modified.txt"
+    data_objects=read_data(path)
+    data_objects=data_objects['data']
+    print(data_objects)
+    data=[]
+    for index in range(len(data_objects)):
+        data_object=data_objects[index]
+        data_object=[[-1*data_object[0][0],-1*data_object[0][1],-1*data_object[0][2]]]
+        print(data_object)
+        data.append(data_object)
+    return data

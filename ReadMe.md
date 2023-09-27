@@ -2,7 +2,7 @@
 
 python3 -m source.main_3d_player
 
-python3 -m unit_tests.Curve_Manager_Module_Tester
+python3 -m unit_tests.curvemanager_tester
 
 
 ## Project Structure

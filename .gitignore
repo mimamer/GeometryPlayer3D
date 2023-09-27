@@ -3,3 +3,4 @@
 ./project/source/__pycache__/*
 ./project/unit_tets/__pycache__/*
 ./project/__pycache__/*
+*/__pycache__/*

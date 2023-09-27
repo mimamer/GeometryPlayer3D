@@ -1,7 +1,7 @@
 import unittest
 from source.curvemanager import CurveManager
 
-class Curve_Manager_module_Tester(unittest.TestCase):
+class CurveManagerTester(unittest.TestCase):
 
     def test_init_with_none(self):
         curve_manager=CurveManager(None)
