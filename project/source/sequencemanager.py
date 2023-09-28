@@ -1,7 +1,7 @@
-from source.curve import Curve
+from source.sequence import Sequence
 
-class CurveManager:
-    def __init__(self,curves : list[Curve] = None):
+class SequenceManager:
+    def __init__(self,curves : list[Sequence] = None):
         
         
         self.tmp_index=0

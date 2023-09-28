@@ -1,7 +1,7 @@
 from source.utils import open_dataobjects, open_dataobjects_minus
-from source.graphanimator3d import GraphAnimator3D
+from source.geometryplayer3d import GeometryPlayer3D
 
 if __name__ == "__main__":
-    player= GraphAnimator3D(open_dataobjects(),open_dataobjects_minus())
+    player= GeometryPlayer3D(open_dataobjects(),open_dataobjects_minus())
     
     player.create_main_window()

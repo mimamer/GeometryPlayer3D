@@ -1,4 +1,4 @@
-class Curve:
+class Sequence:
     def __init__(self, data_objects):
         self.plot_data=None
         self.x=[]
@@ -32,10 +32,10 @@ class Curve:
     def next_value(self,data_objects):
         for i in range(len(data_objects)):
             try:
-                if len(data_objects[i])==1:
-                    yield data_objects[i][0]
-                elif len(data_objects[i])==8:
-                    print("CUBOID")
+                if len(data_objects[i])==3 and (type(data_objects[i][0]) is float or type(data_objects[i][0]) is int):
+                    yield data_objects[i]
+                elif len(data_objects[i])>=2 and type(data_objects[i][0]) is tuple:#only test 0.elem is a bit dirty
+                    print("Line3DCollection")
                     yield None
                 else:
                     raise Exception("Unknown geometric construct")

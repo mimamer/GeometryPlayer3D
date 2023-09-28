@@ -1,21 +1,21 @@
 import unittest
 from source.utils import open_dataobjects
-from source.graphanimator3d import GraphAnimator3D
+from source.geometryplayer3d import GeometryPlayer3D
 
 class AnimatorLogicTester(unittest.TestCase):
     #single curve
 
     def test_press(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         self.assertEqual('foo'.upper(), 'FOO')
 
     def test_zoom_in(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         self.assertTrue('FOO'.isupper())
         self.assertFalse('Foo'.isupper())
 
     def test_zoom_out(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         s = 'hello world'
         self.assertEqual(s.split(), ['hello', 'world'])
         # check that s.split fails when the separator is not a string
@@ -27,7 +27,7 @@ class AnimatorLogicTester(unittest.TestCase):
     
     def test_step_forward(self):
         data_objects=open_dataobjects()
-        player= GraphAnimator3D(data_objects)
+        player= GeometryPlayer3D(data_objects)
         player.forwards()
         curve=player.curve_manager.curves[0]
         test_value=[curve.x,curve.y,curve.z]
@@ -40,7 +40,7 @@ class AnimatorLogicTester(unittest.TestCase):
     
     def test_step_forward_ten_times(self):
         data_objects=open_dataobjects()
-        player= GraphAnimator3D(data_objects)
+        player= GeometryPlayer3D(data_objects)
         reference_value_x=[]
         reference_value_y=[]
         reference_value_z=[]
@@ -60,12 +60,12 @@ class AnimatorLogicTester(unittest.TestCase):
 
 
     def test_step_backwards(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_step_forward_cuboid(self):
         data_objects=open_dataobjects()
-        player= GraphAnimator3D(data_objects)
+        player= GeometryPlayer3D(data_objects)
         reference_value_x=[]
         reference_value_y=[]
         reference_value_z=[]
@@ -87,39 +87,39 @@ class AnimatorLogicTester(unittest.TestCase):
         return
     
     def test_step_backwards_cuboid(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_jump_to_end(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_jump_to_start(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_x_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_invert_x_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_y_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_invert_y_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_z_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
     
     def test_reset_view_invert_z_axis(self):
-        player= GraphAnimator3D(open_dataobjects())
+        player= GeometryPlayer3D(open_dataobjects())
         return
 
     # more than one curve

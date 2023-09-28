@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import PySimpleGUI
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from source.curve import Curve
-from source.curvemanager import CurveManager
+from source.sequence import Sequence
+from source.sequencemanager import SequenceManager
 from source.buttonevent import ButtonEvent
 
 from matplotlib.backend_bases import MouseButton
 
-matplotlib.use("TkAgg")
+matplotlib.use("TkAgg")#TODO:tkinter is needed
 import warnings
 warnings.filterwarnings("error")
 
@@ -17,27 +17,33 @@ from source.utils import get_new_lims
 #import mpl_toolkits
 #from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
-
+from PySimpleGUI import Button
 #dynamisch mit rein tun, falls wert schon da nimm diesen....
-class GraphAnimator3D:
+class GeometryPlayer3D:
+    """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
     def __init__(self,data_objects, data_objects2):
         
         self.switch=False
         self.fig=None
         self.ax=None
+
         self.figure_canvas_agg=None
         self.margins=None
 
-        curves=[Curve(data_objects),Curve(data_objects2)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Sequence(data_objects),Sequence(data_objects2)]#later three_dimensional_player will not receive data_objects for curve this way
         length_data_objects=len(data_objects)
         self.length_plot_window=length_data_objects
         self.create_colors()
 
-        self.curve_manager=CurveManager(curves)
+        self.curve_manager=SequenceManager(curves)
         self.previous_lim_change=None
-
-        button_list=self.register_button_events()
-        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],button_list], finalize=True)
+        button_menu_reset=self.register_button_menu_events()
+        button_list=[button_menu_reset]+self.register_button_events()
+        #menu_def = [['File', ['Open', 'Save', 'Exit',]],
+        #        ['Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],
+        #        ['Help', 'About...'],]
+        
+        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[button_list]], finalize=True,element_justification='c')
         self.create_figure()
         self.draw_figure()
         self.register_mouse_events()
@@ -52,6 +58,9 @@ class GraphAnimator3D:
     def create_figure(self):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(projection='3d') #ax is a subplot
+        self.ax.set_xlabel("x")
+        self.ax.set_ylabel("y")
+        self.ax.set_zlabel("z")
         #self.ax.set_zlim(-1, 1)
         self.ax.use_sticky_edges=False
         self.margins=self.ax.margins()
@@ -72,7 +81,7 @@ class GraphAnimator3D:
 
     def create_colors(self):
             self.colors=[]
-            for cmap in ['Greys','Greens','Purples','Oranges']:#TODO:limits number of curves that can be visualized
+            for cmap in ['Greys','Greens','Purples','Oranges', 'Blues']:#TODO:limits number of curves that can be visualized, cycle, use mod operator
                 cmap=plt.get_cmap(cmap)
                 colo=[]
                 cmap_usable=int(cmap.N/3)
@@ -90,15 +99,20 @@ class GraphAnimator3D:
         #                      linewidth=linewidth, alpha=alpha)
 
         for index in range(len(self.curve_manager.curves)):#cuboids has to be added seperately... see cuboids.py
+            #this is kind of ugly
             curve_plot_data=self.curve_manager.get_curve_data(index)
 
 
             #TODO:only for testing, this is not pretty
+            # here we can divide between scatter and add_collection3d
             if index<len(self.curve_manager.curve_plot):
                 #also changes ax.plot
                 self.curve_manager.curve_plot[index]=self.ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False, c=self.colors[index][:len(curve_plot_data[0])])#could use 3dline?
             else:#curve is not registered in plot data
                 self.curve_manager.curve_plot.append(self.ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False,c=self.colors[index][:len(curve_plot_data[0])]))
+        self.ax.set_xlabel("x")
+        self.ax.set_ylabel("y")
+        self.ax.set_zlabel("z")
         self.ax.use_sticky_edges=False # can not zoom in adequately
         self.ax.margins(self.margins[0],self.margins[1],self.margins[2])
         self.figure_canvas_agg.draw_idle()
@@ -170,16 +184,40 @@ class GraphAnimator3D:
         self.curve_manager.forwards()
         self.plot_curves_actual_plot_data()
 
+    def jump_to_start(self):
+        return
+    def jump_to_end(self):
+        return
+
                 
     def press_switch(self):
         self.switch=not self.switch
 
+    def register_button_menu_events(self):
+        self.values=['x to front','-x to front','y to front','-y to front','z to front','-z to front']
+        return PySimpleGUI.ButtonMenu('Reset View',
+                    [self.values,
+                    self.values],
+                    border_width=2)#,background_color="gray"
+    
+    def trigger_button_menu_events(self,value):
+        print("TRIGGERED")
+        if value=='x to front':
+            print("FRONT X")
+
+
     def register_button_events(self):
-        self.events=[ButtonEvent("<",self.backwards),
-                ButtonEvent("Play/Pause",self.press_switch),
-                ButtonEvent(">",self.forwards),
-                ButtonEvent("+",self.zoom_in),
-                ButtonEvent("-",self.zoom_out)]
+
+        self.events=[
+            #ButtonEvent("Reset x",self.reset_x),
+            ButtonEvent("\u23EE",self.jump_to_start),
+            ButtonEvent("\u23F4",self.backwards),
+            ButtonEvent("\u23EF",self.press_switch),
+            ButtonEvent("\u23F5",self.forwards),
+            ButtonEvent("\u23ED", self.jump_to_end),
+            ButtonEvent("+",self.zoom_in),
+            ButtonEvent("-",self.zoom_out)
+            ]       
         button_list=[]
         for event in self.events:
             button_list.append(event.get_button())
@@ -189,6 +227,8 @@ class GraphAnimator3D:
         for self_event in self.events:
             if self_event.event_name==event:
                 self_event.trigger_command()
+    
+    
 
     def register_mouse_events(self):
         #binding_id = plt.connect('motion_notify_event', on_move)
@@ -204,7 +244,7 @@ class GraphAnimator3D:
             coords = self.ax.format_coord(event.xdata, event.ydata) # coordinates string in the form x=value, y=value, z= value
             print("pressed, coords",coords)
             self.ax.button_pressed = pressed
-            print('you pressed', event.button, event.xdata, event.ydata, event.x, event.y,self.ax.format_coord(event.x,event.y),self.ax.format_coord(event.xdata,event.ydata))
+            print('you pressed', event.button, event.xdata, event.ydata, event.x, event.y,self.ax.format_coord(event.x,event.y))
             
             print("mouseevent occured on the line", self.curve_manager.choose_curve(event))
         plt.connect('scroll_event', on_press)
@@ -213,7 +253,13 @@ class GraphAnimator3D:
     def create_main_window(self):
 
         while True:
-            event, values = self.root.read(timeout=500)
+            event, values = self.root.read(timeout=500)#returns lways the last triggered value, this is a problem.
+            print(event)
+            if hasattr(event,"button"):
+                print("EVENT BUTTON", event.button)
+            if values is not None and 0 in values.keys() and event==0:#leftclick on button menu, not use event.button this would be wrong...
+                self.trigger_button_menu_events(values[0])
+                print("EVENT",event,values[0])
 
             if event == PySimpleGUI.WIN_CLOSED:
                 break
