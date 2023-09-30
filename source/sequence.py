@@ -1,3 +1,8 @@
+        # lc = mcoll.LineCollection(segments, array=z, cmap=cmap, norm=norm,
+        #                      linewidth=linewidth, alpha=alpha)
+#import mpl_toolkits
+#from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
 class Sequence:
     def __init__(self, data_objects):
         self.plot_data=None

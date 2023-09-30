@@ -2,11 +2,9 @@ from source.sequence import Sequence
 
 class SequenceManager:
     def __init__(self,curves : list[Sequence] = None):
-        
-        
         self.tmp_index=0
         self.total_index=0
-        self.curve_plot=[]#all plot data of curves
+        self.plot_data=[]#all plot data of sequences
         
         if curves is None:
             self.curves=[]
@@ -25,7 +23,7 @@ class SequenceManager:
                 return False
         return True
         
-    def get_curve_data(self,index):
+    def get_sequence_data(self,index):
         return self.curves[index].get_curve_plot_data()
     
     def adjust_data_points_for_zoom_delete_max(self):
@@ -60,15 +58,13 @@ class SequenceManager:
             curve.set_plot_data_to_cuboid(max_abs_value,self.chosen_point,axis)
         print("FORCE NEW BOUNDS--END")
 
-    def forwards(self):
-        self.step()
 
     def backwards(self):
         if self.tmp_index>0:
             self.tmp_index=self.tmp_index-1
             self.set_plot_data_regarding_tmp_index()
 
-    def step(self):
+    def forwards(self):#step
         if self.curves != []:
             self.tmp_index+=1
             #!= to have the right behavior when we used backwards
@@ -78,7 +74,6 @@ class SequenceManager:
             self.set_plot_data_regarding_tmp_index()
             
             
-
     def add_point(self):
         for curve in self.curves:
             curve.add_point()
@@ -89,10 +84,28 @@ class SequenceManager:
         for curve in self.curves:
             curve.reset_to_actual_points(self.tmp_index)
 
-    def choose_curve(self,event):
-        for index in range(len(self.curve_plot)):
-            print(self.curve_plot[index])
-            test=(self.curve_plot[index].contains(event))#TODO:does not work :( only with Line2D
+    def choose_sequence(self,event):
+        for index in range(len(self.plot_data)):
+            print(self.plot_data[index])
+            test=(self.plot_data[index].contains(event))#TODO:does not work :( only with Line2D
             if(test):
                 self.chosen_curve=index
                 return index
+            
+    def set_actual_plot_data(self,ax,colors):
+        for index in range(len(self.curves)):#cuboids has to be added seperately... see cuboids.py
+                #this is kind of ugly
+                curve_plot_data=self.get_sequence_data(index)
+                #TODO:only for testing, this is not pretty
+                # here we can divide between scatter and add_collection3d
+                if index<len(self.plot_data):
+                    #also changes ax.plot
+                    self.plot_data[index]=ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False, c=colors[index][:len(curve_plot_data[0])])#could use 3dline?
+                else:#curve is not registered in plot data
+                    self.plot_data.append(ax.scatter(xs=curve_plot_data[0], ys=curve_plot_data[1],  zs=curve_plot_data[2], depthshade=False,c=colors[index][:len(curve_plot_data[0])]))
+
+
+    def jump_to_start(self):
+        return
+    def jump_to_end(self):
+        return
