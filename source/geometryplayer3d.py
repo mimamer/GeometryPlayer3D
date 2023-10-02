@@ -16,20 +16,17 @@ from source.utils import get_new_lims, create_colors
 
 class GeometryPlayer3D:
     """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
-    def __init__(self,data_objects, data_objects2):
+    def __init__(self,data_objects):
         
         self.switch=False
-
         self.fig=None
         self.ax=None
         self.figure_canvas_agg=None
-        self.zoom_factor=0
-        self.zoom_step=0.01
 
         self.length_plot_window=len(data_objects)#TODO:only temporary
         self.colors=create_colors(self.length_plot_window)
 
-        curves=[Sequence(data_objects),Sequence(data_objects2)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Sequence(data_objects)]#later three_dimensional_player will not receive data_objects for curve this way
         self.sequence_manager=SequenceManager(curves)
         self.previous_lim_change=None
         button_menu_reset=self.register_button_menu_events()
@@ -62,24 +59,6 @@ class GeometryPlayer3D:
         self.default_ax_setting()
         self.figure_canvas_agg.draw_idle()#TODO:necesary?
 
-
-    def zoom(self):#zoom should keep view angle, even when adjust is necessary
-        self.sequence_manager.adjust_data_points_for_zoom_delete_max()
-
-
-    def zoom_out(self):
-        if self.sequence_manager.is_empty_plot():
-            return
-        self.zoom_factor-=1
-        self.sequence_manager.set_plot_data_regarding_tmp_index()
-        for i in range(self.zoom_factor):
-            self.zoom()
-
-    def zoom_in(self):
-        if self.sequence_manager.is_empty_plot():
-            return
-        self.zoom_factor+=1
-        self.zoom()
     
     def run_figure(self):
         if self.switch:
@@ -109,8 +88,8 @@ class GeometryPlayer3D:
             ButtonEvent("\u23EF",self.dummy ),
             ButtonEvent("\u23F5",self.sequence_manager.forwards),
             ButtonEvent("\u23ED", self.sequence_manager.jump_to_end),
-            ButtonEvent("+",self.zoom_in),#zoom is kind of difficult to move into another class. Maybe ax as own, don't know
-            ButtonEvent("-",self.zoom_out)
+            ButtonEvent("+",self.sequence_manager.zoom_in),#zoom is kind of difficult to move into another class. Maybe ax as own, don't know
+            ButtonEvent("-",self.sequence_manager.zoom_out)
             ]       
         button_list=[]
         for event in self.events:
@@ -138,11 +117,11 @@ class GeometryPlayer3D:
     def on_press(self,event):
         if event.button=="up":
             self.switch=False
-            self.zoom_in()
+            self.sequence_manager.zoom_in()
             self.set_actual_plot()
         elif event.button=="down":
             self.switch=False
-            self.zoom_out()
+            self.sequence_manager.zoom_out()
             self.set_actual_plot()
         pressed = self.ax.button_pressed
         self.ax.button_pressed = -1 # some value that doesn't make sense.

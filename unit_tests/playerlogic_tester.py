@@ -31,7 +31,7 @@ class AnimatorLogicTester(unittest.TestCase):
         player.forwards()
         curve=player.sequence_manager.sequences[0]
         test_value=[curve.x,curve.y,curve.z]
-        test_plot_value=curve.get_curve_plot_data()
+        test_plot_value=curve.get_sequence_plot_data()
         self.assertEqual(test_value,test_plot_value)
         self.assertEqual(curve.x,[data_objects[0][0][0]])
         self.assertEqual(curve.y,[data_objects[0][0][1]])
@@ -52,7 +52,7 @@ class AnimatorLogicTester(unittest.TestCase):
             reference_value_z.append(data_objects[i][0][2])
         curve=player.sequence_manager.sequences[0]
         test_value=[curve.x,curve.y,curve.z]
-        test_plot_value=curve.get_curve_plot_data()
+        test_plot_value=curve.get_sequence_plot_data()
         self.assertEqual(test_value,test_plot_value)
         self.assertEqual(test_value,
                          [reference_value_x,reference_value_y,reference_value_z])
@@ -76,11 +76,10 @@ class AnimatorLogicTester(unittest.TestCase):
             reference_value_y.append(data_objects[i][0][1])
             reference_value_z.append(data_objects[i][0][2])
             i+=1
-        # das als Datenstruktur ist womoeglich zu lose -> Point3d and Cuboid3d?   
-        # Ploy3DCollection ? 
+
         curve=player.sequence_manager.sequences[0]
         test_value=[curve.x,curve.y,curve.z]
-        test_plot_value=curve.get_curve_plot_data()
+        test_plot_value=curve.get_sequence_plot_data()
         self.assertEqual(test_value,test_plot_value)
         self.assertEqual(test_value,
                          [reference_value_x,reference_value_y,reference_value_z])

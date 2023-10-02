@@ -46,8 +46,15 @@ def open_dataobjects():
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
+
 def open_dataobjects_2():
     path="/home/michelle/real/3d_player/test_data/modified_meth1.txt"
+    data_objects=read_data(path)
+    data_objects=data_objects['data']
+    return data_objects
+
+def open_dataobjects_testformat():
+    path="/home/michelle/real/3d_player/test_data/formattest.txt"
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
