@@ -5,7 +5,7 @@ class CurveManagerTester(unittest.TestCase):
 
     def test_init_with_none(self):
         curve_manager=SequenceManager(None)
-        self.assertEqual(curve_manager.curves, [])
+        self.assertEqual(curve_manager.sequences, [])
 
 
 if __name__ == '__main__':

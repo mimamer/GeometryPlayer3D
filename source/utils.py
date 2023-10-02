@@ -77,3 +77,6 @@ def create_colors(length_plot_window):
             i+=1
         colors.append(colo)
     return colors
+
+def square_distance_between(point_a,point_b):
+    return (point_a[0]-point_b[0])**2+(point_a[1]-point_b[1])**2+(point_a[2]-point_b[2])**2

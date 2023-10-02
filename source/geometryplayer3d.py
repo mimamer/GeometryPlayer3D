@@ -23,7 +23,8 @@ class GeometryPlayer3D:
         self.fig=None
         self.ax=None
         self.figure_canvas_agg=None
-        self.margins=None
+        self.zoom_factor=0
+        self.zoom_step=0.01
 
         self.length_plot_window=len(data_objects)#TODO:only temporary
         self.colors=create_colors(self.length_plot_window)
@@ -45,7 +46,6 @@ class GeometryPlayer3D:
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(projection='3d') #ax is a subplot
         self.default_ax_setting()
-        self.margins=self.ax.margins()
         self.figure_canvas_agg = FigureCanvasTkAgg(self.fig, self.root["-CANVAS-"].TKCanvas)
         self.figure_canvas_agg.draw()
         self.figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
@@ -58,71 +58,28 @@ class GeometryPlayer3D:
     
     def set_actual_plot(self):
         self.ax.cla() #clear ax
-
         self.sequence_manager.set_actual_plot_data(self.ax, self.colors)
         self.default_ax_setting()
-
-        self.ax.margins(self.margins[0],self.margins[1],self.margins[2])
         self.figure_canvas_agg.draw_idle()#TODO:necesary?
 
-    def adjust_data_points_for_zoom(self,lim_x,lim_y,lim_z): #TODO : zoom to point, center this point first then zoom in
-        self.sequence_manager.adjust_data_points_for_zoom(lim_x,lim_y,lim_z)
-        self.set_actual_plot()
 
-    def set_lims(self, lim_x,lim_y,lim_z):#if here not a lim arrives we need to adjust throw USERWARNING
-        print("SET NEW LIMS", lim_x,lim_y,lim_z)
-        if self.previous_lim_change==[lim_x,lim_y,lim_z]:
-            raise UserWarning("CHANGE DID NOT SUCCEED")
-        self.ax.set_xlim(lim_x[0],lim_x[1])
-        self.ax.set_ylim(lim_y[0],lim_y[1])
-        self.ax.set_zlim(lim_z[0],lim_z[1])
-        self.previous_lim_change=[lim_x,lim_y,lim_z]
-    
-    def set_new_lims(self):
-        #again not fixed zoom in, UserWarning automatically expanding does occur instantly,
-        # maybe choose a point in the chain and zoom to it, due to cut away data points
-        #corrupt
-        previous_x_lim=self.ax.get_xlim()
-        previous_y_lim=self.ax.get_ylim()
-        previous_z_lim=self.ax.get_zlim()
-        lim_x=get_new_lims(lim_tuple=previous_x_lim)
-        lim_y=get_new_lims(lim_tuple=previous_y_lim)
-        lim_z=get_new_lims(lim_tuple=previous_z_lim)
+    def zoom(self):#zoom should keep view angle, even when adjust is necessary
+        self.sequence_manager.adjust_data_points_for_zoom_delete_max()
 
-        try:
-            if lim_x==previous_x_lim and lim_y==previous_y_lim and lim_z==previous_z_lim:
-                self.adjust_data_points_for_zoom(lim_x,lim_y,lim_z)
-            else:
-                self.set_lims(lim_x,lim_y,lim_z)
-
-        except UserWarning as e:
-            if str(e)=="CHANGE DID NOT SUCCEED":
-                print("CASE ADJUST 2")
-                self.sequence_manager.adjust_data_points_for_zoom_delete_max()
-                self.set_actual_plot()
-            else:
-                print("USERWARNING",e)
-                lim_x=get_new_lims(lim_tuple=previous_x_lim)
-                lim_y=get_new_lims(lim_tuple=previous_y_lim)
-                lim_z=get_new_lims(lim_tuple=previous_z_lim)
-                self.adjust_data_points_for_zoom(lim_x,lim_y,lim_z)
-                pass
-
-    def zoom(self, zoom_value):#zoom should keep view angle, even when adjust is necessary
-        #TODO: catch None Case (no points at the beginning)
-        try:
-            self.margins=(self.margins[0]+zoom_value,self.margins[1]+zoom_value,self.margins[2]+zoom_value)
-            self.set_actual_plot()
-        except ValueError: #only for zoom_in ValueError
-            self.margins=(-0.49,-0.49,-0.49)
-            self.set_actual_plot()
 
     def zoom_out(self):
-        self.zoom(0.01)
+        if self.sequence_manager.is_empty_plot():
+            return
+        self.zoom_factor-=1
+        self.sequence_manager.set_plot_data_regarding_tmp_index()
+        for i in range(self.zoom_factor):
+            self.zoom()
 
     def zoom_in(self):
-        self.zoom(-0.01)
-        self.set_new_lims()
+        if self.sequence_manager.is_empty_plot():
+            return
+        self.zoom_factor+=1
+        self.zoom()
     
     def run_figure(self):
         if self.switch:
