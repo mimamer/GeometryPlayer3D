@@ -10,6 +10,8 @@ class SequenceManager:
             self.sequences=[]
         else:
             self.sequences=curves
+        self.finished_sequences=[]
+        self.addable_points=len(self.sequences)
         
 
 
@@ -55,32 +57,39 @@ class SequenceManager:
                 self.sequences[index].set_plot_data_to_radius()#TODO:rename?
 
 
-    def backwards(self):
+    def backwards(self):#TODO:what if sequences have different lenght
         if self.tmp_index>0:
             self.tmp_index=self.tmp_index-1
             self.set_plot_data_regarding_tmp_index()
 
     def forwards(self):#step
-        if self.sequences != []:
-            try:
-                self.tmp_index+=1
-                #!= to have the right behavior when we used backwards
-                if self.tmp_index>self.total_index:
-                    self.add_point()
-                    #sache mit den Quadern fehlt noch...
-                self.set_plot_data_regarding_tmp_index()
-            except StopIteration:
-                pass
+        if self.sequences == []:
+            return
+        if self.addable_points>0 or self.tmp_index<self.total_index:
+            self.tmp_index+=1
+            #!= to have the right behavior when we used backwards
+            if self.tmp_index>self.total_index:
+                self.addable_points-=self.add_point()
+                #sache mit den Quadern fehlt noch...
+            self.set_plot_data_regarding_tmp_index()
+
             
             
-    def add_point(self):     
-        try:
-            for sequence in self.sequences:
-                sequence.add_point()
-            if self.sequences!=[]:
+    def add_point(self):  
+        if self.addable_points>0:   
+            stop_iteration_counter=0
+            for index in range(len(self.sequences)):
+                if index not in self.finished_sequences:
+                    try:
+                        self.sequences[index].add_point()
+                    except StopIteration:
+                        self.finished_sequences.append(index)
+                        stop_iteration_counter+=1
+            if self.sequences!=[] and len(self.finished_sequences)!=len(self.sequences):
                 self.total_index+=1
-        except StopIteration as stop:
-                raise stop
+            return stop_iteration_counter
+        return 0
+
 
 
     def set_plot_data_regarding_tmp_index(self):
@@ -106,16 +115,13 @@ class SequenceManager:
 
     def jump_to_start(self):
         return
+
     def jump_to_end(self):
-        if self.sequences != []:
-            while True:
-                try:
-                    self.tmp_index+=1
-                    #!= to have the right behavior when we used backwards
-                    if self.tmp_index>self.total_index:
-                        self.add_point()
-                        #sache mit den Quadern fehlt noch...
-                    
-                except StopIteration:
-                    break
-            self.set_plot_data_regarding_tmp_index()
+        if self.sequences == []:
+            return
+        while self.addable_points>0 or self.tmp_index<self.total_index:
+                self.tmp_index+=1
+                #!= to have the right behavior when we used backwards
+                if self.tmp_index>self.total_index:
+                    self.addable_points-=self.add_point()
+        self.set_plot_data_regarding_tmp_index()

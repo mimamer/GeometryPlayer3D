@@ -7,9 +7,9 @@ is_visible_factor=0.01
 class DataObject:
     def __init__(self,data):
         self.is_vertex=True
-        self.width=0
-        self.height=0
-        self.depth=0
+        self.width_x=0
+        self.height_y=0
+        self.depth_z=0
         factor=0.01 #is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
         if len(data)!=1:
             self.is_vertex=False

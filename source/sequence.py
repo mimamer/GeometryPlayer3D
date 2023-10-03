@@ -7,7 +7,10 @@ class Sequence:
         self.gen  = self.next_value(input_objects)
 
     def reset_to_actual_points(self,tmp_index):
-        self.plot_data=self.data_objects[:tmp_index]
+        if tmp_index>=len(self.data_objects):
+            self.plot_data=self.data_objects[:len(self.data_objects)]
+        else:
+            self.plot_data=self.data_objects[:tmp_index]
 
     def plot_sequence_data(self,ax,color):
         for index in range(len(self.plot_data)):#TODO:color is changing, is this good? -> not when zooming

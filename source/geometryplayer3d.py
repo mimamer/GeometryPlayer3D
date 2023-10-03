@@ -16,17 +16,17 @@ from source.utils import create_colors
 
 class GeometryPlayer3D:
     """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
-    def __init__(self,data_objects):
+    def __init__(self,data_objects,data_objects_2):
         
         self.switch=False
         self.fig=None
         self.ax=None
         self.figure_canvas_agg=None
 
-        self.length_plot_window=len(data_objects)#TODO:only temporary
+        self.length_plot_window=len(data_objects_2)#TODO:only temporary
         self.colors=create_colors(self.length_plot_window)
 
-        curves=[Sequence(data_objects)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Sequence(data_objects),Sequence(data_objects_2)]#later three_dimensional_player will not receive data_objects for curve this way
         self.sequence_manager=SequenceManager(curves)
         self.previous_lim_change=None
         button_menu_reset=self.register_button_menu_events()
@@ -107,7 +107,6 @@ class GeometryPlayer3D:
             if self_event.event_name==event:
                 self.switch=False
                 self_event.trigger_command()
-                print("Command",self_event.event_name,[self.sequence_manager.sequences[0].plot_data[index].data for index in range(len(self.sequence_manager.sequences[0].plot_data))])
                 self.set_actual_plot()
     
     def register_mouse_events(self):

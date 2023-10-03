@@ -2,6 +2,6 @@ from source.utils import open_dataobjects,open_dataobjects_testformat, open_data
 from source.geometryplayer3d import GeometryPlayer3D
 
 if __name__ == "__main__":
-    player= GeometryPlayer3D(open_dataobjects_testformat())
+    player= GeometryPlayer3D(open_dataobjects_testformat(),open_dataobjects())
     
     player.main_loop()
