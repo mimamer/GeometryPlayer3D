@@ -8,7 +8,7 @@ from source.buttonevent import ButtonEvent
 
 from matplotlib.backend_bases import MouseButton
 
-matplotlib.use("TkAgg")#TODO:tkinter is needed
+matplotlib.use("TkAgg")
 import warnings
 warnings.filterwarnings("error")
 
@@ -51,13 +51,13 @@ class GeometryPlayer3D:
         self.ax.set_xlabel("x")
         self.ax.set_ylabel("y")
         self.ax.set_zlabel("z")
-        self.ax.use_sticky_edges=False # can not zoom in adequately
+        #self.ax.use_sticky_edges=False # can not zoom in adequately
     
     def set_actual_plot(self):
         self.ax.cla() #clear ax
         self.sequence_manager.set_actual_plot_data(self.ax, self.colors)
         self.default_ax_setting()
-        self.figure_canvas_agg.draw_idle()#TODO:necesary?
+        self.figure_canvas_agg.draw_idle()#TODO:neccessary?
 
     
     def run_figure(self):

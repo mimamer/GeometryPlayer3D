@@ -19,12 +19,23 @@ class Sequence:
         actual_point_list_z=[]
         start_list_index=0
         index=0
-        while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming
+        plot_first_linecollection3d=True
+        plot_contains_points=False
+        while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming (mehr als eine Zusammenhangskomponente)
             if self.plot_data[index].is_vertex:
                 actual_point_list_x.append(self.plot_data[index].data[0])
                 actual_point_list_y.append(self.plot_data[index].data[1])
                 actual_point_list_z.append(self.plot_data[index].data[2])
-            else:#LineCollextion3D
+                plot_contains_points=True
+            else:#LineCollection3D
+                if plot_first_linecollection3d and not plot_contains_points:#problem if all the points come after this stuff...
+                    #TODO:have to do this after all points are plotted , create testdata first
+                    # -> cuboids need to be plotted later, remember color in "cuboid list" eg.
+                    print("Tighten ax lims")
+                    ax.set_xlim((self.plot_data[index].min_lims[0],self.plot_data[index].max_lims[0]))
+                    ax.set_ylim((self.plot_data[index].min_lims[1],self.plot_data[index].max_lims[1]))
+                    ax.set_zlim((self.plot_data[index].min_lims[2],self.plot_data[index].max_lims[2]))
+                plot_first_linecollection3d=False
                 if len(actual_point_list_x)>0:
                     ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False, c=color[start_list_index:len(actual_point_list_x)])
                     actual_point_list_x=[]
@@ -32,6 +43,7 @@ class Sequence:
                     actual_point_list_z=[]
                     start_list_index=index+1
                 self.plot_data[index].plot_data_object(ax,color[index])
+                
             index+=1
         if len(actual_point_list_x)>0:
             ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,\

@@ -54,24 +54,23 @@ class DataObject:
                 ax.scatter(xs=self.data[0][0][0], ys=self.data[0][0][1],  zs=self.data[0][0][2], depthshade=False, c=color, marker="s")
             else:
                 ax.add_collection3d(Line3DCollection(self.data,edgecolor=color))
-                self.correct_ax_lims(ax)
-            
-    
-    def correct_ax_lims(self,ax):
+                self.widening_ax_lims(ax)
+
+    def widening_ax_lims(self,ax):# only widening
         if ax.get_xlim()[0] > self.min_lims[0]:
             ax.set_xlim((self.min_lims[0],ax.get_xlim()[1]))
         if ax.get_xlim()[1] < self.max_lims[0]:
-            ax.set_xlim((ax.get_xlims()[0],self.max_lims[0]))
+            ax.set_xlim((ax.get_xlim()[0],self.max_lims[0]))
 
         if ax.get_ylim()[0] > self.min_lims[1]:
             ax.set_ylim((self.min_lims[1],ax.get_ylim()[1]))
         if ax.get_ylim()[1] < self.max_lims[1]:
-            ax.set_ylim((ax.get_ylims()[0],self.max_lims[1]))
+            ax.set_ylim((ax.get_ylim()[0],self.max_lims[1]))
 
         if ax.get_zlim()[0] > self.min_lims[2]:
             ax.set_zlim((self.min_lims[2],ax.get_zlim()[1]))
         if ax.get_zlim()[1] < self.max_lims[2]:
-            ax.set_zlim((ax.get_zlims()[0],self.max_lims[2]))
+            ax.set_zlim((ax.get_zlim()[0],self.max_lims[2]))
 
 def square_distance_between(object_a:DataObject,object_b:DataObject):
     if object_a.is_vertex and object_b.is_vertex:

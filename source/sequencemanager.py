@@ -39,12 +39,22 @@ class SequenceManager:
         self.zoom()
     
     def zoom(self):
-        if self.is_empty_plot():#TODO: this case should not appear
+        if self.is_empty_plot():
             return
+        
+        self.chosen_sequence=self.sequences[0]
+        self.chosen_data_object=self.chosen_sequence.data_objects[2]
+
         # radial zoom (because it's instinctive),
         # although it is possible to not show a border data point even if it would be in the cubic view
-        self.chosen_sequence=self.sequences[0]
-        self.chosen_data_object=self.chosen_sequence.data_objects[0]
+        empty=0
+        for sequence in self.sequences:
+            if sequence.is_empty():
+                empty+=1
+
+        if empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1:
+            return
+
         sq_dist_values=[]
         for index in range(len(self.sequences)):
             sequence=self.sequences[index]
@@ -57,7 +67,7 @@ class SequenceManager:
                 self.sequences[index].set_plot_data_to_radius()#TODO:rename?
 
 
-    def backwards(self):#TODO:what if sequences have different lenght
+    def backwards(self):
         if self.tmp_index>0:
             self.tmp_index=self.tmp_index-1
             self.set_plot_data_regarding_tmp_index()
