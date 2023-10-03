@@ -1,4 +1,4 @@
-from source.utils import square_distance_between
+from source.dataobject import square_distance_between
 from source.dataobject import DataObject
 class Sequence:
     def __init__(self, input_objects):
@@ -10,8 +10,8 @@ class Sequence:
         self.plot_data=self.data_objects[:tmp_index]
 
     def plot_sequence_data(self,ax,color):
-        for index in range(len(self.plot_data)):
-            self.data_objects[index].plot_data_object(ax,color[index])
+        for index in range(len(self.plot_data)):#TODO:color is changing, is this good? -> not when zooming
+            self.plot_data[index].plot_data_object(ax,color[index])
     
     def add_point(self):
         try:
@@ -35,23 +35,18 @@ class Sequence:
     def get_sequence_plot_data(self):
         return self.plot_data
 
-    #TODO:next two functions need a change
+    
     def get_max_squared_dist_value(self,chosen_data_object):
-        sq_dist_values=[square_distance_between(\
-            [self.plot_data[0][i],self.plot_data[1][i],self.plot_data[2][i]],chosen_data_object)\
-                  for i in range(len(self.plot_data[0]))]
+        sq_dist_values=[square_distance_between(self.plot_data[i],chosen_data_object) 
+                            for i in range(len(self.plot_data))]
         max_sq_dist_value=max(sq_dist_values)
-        self.delete_list=[index for index in range(len(self.plot_data[0])) if sq_dist_values[index]==max_sq_dist_value]
+        self.delete_list=[index for index in range(len(self.plot_data)) if sq_dist_values[index]==max_sq_dist_value]
         return max_sq_dist_value
-
+    
     def set_plot_data_to_radius(self):
-        xvals=[]
-        yvals=[]
-        zvals=[]
-        for index in range(len(self.plot_data[0])):
+        vals=[]
+        for index in range(len(self.plot_data)):
             if index in self.delete_list:
                 continue
-            xvals.append(self.plot_data[0][index])
-            yvals.append(self.plot_data[1][index])
-            zvals.append(self.plot_data[2][index])
-        self.plot_data=[xvals,yvals,zvals]
+            vals.append(self.plot_data[index])
+        self.plot_data=vals

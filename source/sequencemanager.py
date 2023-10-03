@@ -5,7 +5,6 @@ class SequenceManager:
         self.tmp_index=0
         self.total_index=0
         self.zoom_factor=0
-        self.plot_data=[]#all plot data of sequences
         
         if curves is None:
             self.sequences=[]
@@ -97,11 +96,10 @@ class SequenceManager:
         #        self.chosen_sequence=index
         #        return index
             
-    def set_actual_plot_data(self,ax,colors):#TODO:
+    def set_actual_plot_data(self,ax,colors):
         if self.is_empty_plot():
             return
-        for index in range(len(self.sequences)):#cuboids has to be added seperately... see cuboids.py
-                #this is kind of ugly
+        for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
                 sequence.plot_sequence_data(ax,colors[index])
 

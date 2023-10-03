@@ -12,7 +12,7 @@ matplotlib.use("TkAgg")#TODO:tkinter is needed
 import warnings
 warnings.filterwarnings("error")
 
-from source.utils import get_new_lims, create_colors
+from source.utils import create_colors
 
 class GeometryPlayer3D:
     """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
@@ -107,6 +107,7 @@ class GeometryPlayer3D:
             if self_event.event_name==event:
                 self.switch=False
                 self_event.trigger_command()
+                print("Command",self_event.event_name,[self.sequence_manager.sequences[0].plot_data[index].data for index in range(len(self.sequence_manager.sequences[0].plot_data))])
                 self.set_actual_plot()
     
     def register_mouse_events(self):
