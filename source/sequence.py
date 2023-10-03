@@ -13,9 +13,29 @@ class Sequence:
             self.plot_data=self.data_objects[:tmp_index]
 
     def plot_sequence_data(self,ax,color):
-        for index in range(len(self.plot_data)):#TODO:color is changing, is this good? -> not when zooming
-            self.plot_data[index].plot_data_object(ax,color[index])
-    
+        #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
+        actual_point_list_x=[]
+        actual_point_list_y=[]
+        actual_point_list_z=[]
+        start_list_index=0
+        index=0
+        while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming
+            if self.plot_data[index].is_vertex:
+                actual_point_list_x.append(self.plot_data[index].data[0])
+                actual_point_list_y.append(self.plot_data[index].data[1])
+                actual_point_list_z.append(self.plot_data[index].data[2])
+            else:#LineCollextion3D
+                if len(actual_point_list_x)>0:
+                    ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False, c=color[start_list_index:len(actual_point_list_x)])
+                    actual_point_list_x=[]
+                    actual_point_list_y=[]
+                    actual_point_list_z=[]
+                    start_list_index=index+1
+                self.plot_data[index].plot_data_object(ax,color[index])
+            index+=1
+        if len(actual_point_list_x)>0:
+            ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,\
+                        c=color[start_list_index:start_list_index+len(actual_point_list_x)])    
     def add_point(self):
         try:
             data_object = next(self.gen)
