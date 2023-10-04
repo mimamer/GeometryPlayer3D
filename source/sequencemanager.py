@@ -25,20 +25,16 @@ class SequenceManager:
         return self.sequences[index].get_curve_plot_data()
     
     def zoom_out(self):
-        if self.is_empty_plot():
+        if self.zoom_factor==0 or self.is_empty_plot():
             return
-        self.zoom_factor-=1
+        tmp_zoom_factor=self.zoom_factor-1
         self.set_plot_data_regarding_tmp_index()
-        for i in range(self.zoom_factor):
-            self.zoom()
+        for i in range(tmp_zoom_factor):
+            self.zoom_in()
+        self.zoom_factor=tmp_zoom_factor
 
-    def zoom_in(self):
-        if self.is_empty_plot():
-            return
-        self.zoom_factor+=1
-        self.zoom()
     
-    def zoom(self):
+    def zoom_in(self):
         if self.is_empty_plot():
             return
         
@@ -65,6 +61,7 @@ class SequenceManager:
         for index in range(len(self.sequences)):
             if not self.sequences[index].is_empty() and max_value==sq_dist_values[index]:
                 self.sequences[index].set_plot_data_to_radius()#TODO:rename?
+        self.zoom_factor+=1
 
 
     def backwards(self):

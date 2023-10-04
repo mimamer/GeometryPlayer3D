@@ -29,8 +29,10 @@ class GeometryPlayer3D:
         curves=[Sequence(data_objects),Sequence(data_objects_2)]#later three_dimensional_player will not receive data_objects for curve this way
         self.sequence_manager=SequenceManager(curves)
         self.previous_lim_change=None
-        button_menu_reset=self.register_button_menu_events()
-        button_list=[button_menu_reset]+self.register_button_events()
+        button_menu_reset,menu_buttons=self.register_button_menu_events()
+        button_list,normal_buttons=self.register_button_events()
+        button_list=[button_menu_reset]+button_list
+        self.events=normal_buttons+menu_buttons
         #menu_def = [['File', ['Open', 'Save', 'Exit',]],
         #        ['Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],
         #        ['Help', 'About...'],]
@@ -69,32 +71,64 @@ class GeometryPlayer3D:
         self.switch=not self.switch
 
     def register_button_menu_events(self):
-        self.values=['x to front','-x to front','y to front','-y to front','z to front','-z to front']
+        button_menu_events=[
+            ButtonEvent("standard view",self.standard_view),
+            ButtonEvent("front view",self.front_view),
+            ButtonEvent("front view",self.front_view),
+            ButtonEvent("back view",self.back_view),
+            ButtonEvent("left view",self.left_view ),
+            ButtonEvent("right view",self.right_view),
+            ButtonEvent("top view", self.top_view),
+            ButtonEvent("bottom view", self.bottom_view),
+        ]
+        names=[]
+        for event in button_menu_events:
+            names.append(event.event_name)
+
         return PySimpleGUI.ButtonMenu('Reset View',
-                    [self.values,
-                    self.values],
-                    border_width=2)#,background_color="gray"
-    
-    def trigger_button_menu_events(self,value):#here we need self.values, or better analogoues to ButtonEvent but without Button instead Strings and again trigger_command
-        print("TRIGGERED")
-        if value=='x to front':
-            print("FRONT X")
+                    [names,
+                    names],
+                    border_width=2),button_menu_events#,background_color="gray"
+    def standard_view(self):
+        self.ax.azim=-60
+        self.ax.elev=30
+    def front_view(self):
+        self.ax.azim=0
+        self.ax.elev=0
+    def back_view(self):
+        self.ax.azim=180
+        self.ax.elev=0
+    def left_view(self):
+        self.ax.azim=-90
+        self.ax.elev=0
+    def right_view(self):
+        self.ax.azim=90
+        self.ax.elev=0
+    def top_view(self):
+        self.ax.azim=0
+        self.ax.elev=90
+    def bottom_view(self):
+        self.ax.azim=0
+        self.ax.elev=-90
+
+    def trigger_button_menu_events(self,value):
+        self.trigger_button_events(value)
 
     def register_button_events(self):
-        self.events=[
+        normal_buttons=[
             #ButtonEvent("Reset x",self.reset_x),
             ButtonEvent("\u23EE",self.sequence_manager.jump_to_start),
             ButtonEvent("\u23F4",self.sequence_manager.backwards),
             ButtonEvent("\u23EF",self.dummy ),
             ButtonEvent("\u23F5",self.sequence_manager.forwards),
             ButtonEvent("\u23ED", self.sequence_manager.jump_to_end),
-            ButtonEvent("+",self.sequence_manager.zoom_in),#zoom is kind of difficult to move into another class. Maybe ax as own, don't know
+            ButtonEvent("+",self.sequence_manager.zoom_in),
             ButtonEvent("-",self.sequence_manager.zoom_out)
             ]       
         button_list=[]
-        for event in self.events:
+        for event in normal_buttons:
             button_list.append(event.get_button())
-        return button_list
+        return button_list, normal_buttons
     
     def dummy(self):
         return
@@ -134,10 +168,11 @@ class GeometryPlayer3D:
 
     def main_loop(self):
         while True:
-            event, values = self.root.read(timeout=500)#returns lways the last triggered value, this is a problem.
-            if values is not None and 0 in values.keys() and event==0:#leftclick on button menu, not use event.button this would be wrong...
+            event, values = self.root.read(timeout=500)
+            #if event!="__TIMEOUT__":
+            #    print(event, values)
+            if values is not None and 0 in values.keys() and event==0:#button menu was triggered 
                 self.trigger_button_menu_events(values[0])
-                print("EVENT",event,values[0])
 
             if event == PySimpleGUI.WIN_CLOSED:
                 break

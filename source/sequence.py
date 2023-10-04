@@ -5,6 +5,7 @@ class Sequence:
         self.plot_data=None
         self.data_objects=[]
         self.gen  = self.next_value(input_objects)
+        self.distance_dict={}
 
     def reset_to_actual_points(self,tmp_index):
         if tmp_index>=len(self.data_objects):
@@ -70,11 +71,29 @@ class Sequence:
     def get_sequence_plot_data(self):
         return self.plot_data
 
-    
+    #TODO: dynamisch, lege pro sequenz distance-dir an: ref_0(chosen): { ref_1: wert_1, ref_2: wert_2 usw}
     def get_max_squared_dist_value(self,chosen_data_object):
-        sq_dist_values=[square_distance_between(self.plot_data[i],chosen_data_object) 
-                            for i in range(len(self.plot_data))]
+        if self.distance_dict =={} or chosen_data_object not in self.distance_dict.keys():
+            distance_dict_for_chosen={}
+            for i in range(len(self.plot_data)):#erganze demnach falls ref nicht plot data war
+                distance_dict_for_chosen[self.plot_data[i]]=square_distance_between(self.plot_data[i],chosen_data_object) 
+                #nur die aus dem dict
+            self.distance_dict[chosen_data_object]=distance_dict_for_chosen
+
+        sq_dist_values=[]
+        for data_object in self.plot_data:
+            if data_object in self.distance_dict[chosen_data_object].keys():
+                sq_dist_values.append(self.distance_dict[chosen_data_object][data_object])
+            else:
+                new_value=square_distance_between(data_object,chosen_data_object)
+                self.distance_dict[chosen_data_object][data_object]=new_value
+                sq_dist_values.append(new_value)
+
+            
+       # sq_dist_values=[square_distance_between(self.plot_data[i],chosen_data_object) 
+       #                     for i in range(len(self.plot_data))]#nur die aus dem dict
         max_sq_dist_value=max(sq_dist_values)
+
         self.delete_list=[index for index in range(len(self.plot_data)) if sq_dist_values[index]==max_sq_dist_value]
         return max_sq_dist_value
     
