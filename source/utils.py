@@ -25,16 +25,16 @@ def open_dataobjects_testformat():
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
-def open_dataobjects_minus():
-    path="/home/michelle/real/3d_player/test_data/modified_meth0.txt"
-    data_objects=read_data(path)
-    data_objects=data_objects['data']
-    data=[]
-    for index in range(len(data_objects)):
-        data_object=data_objects[index]
-        data_object=[-1*data_object[0],-1*data_object[1],-1*data_object[2]]
-        data.append(data_object)
-    return data
+#def open_dataobjects_minus():
+#    path="/home/michelle/real/3d_player/test_data/modified_meth0.txt"
+#    data_objects=read_data(path)
+#    data_objects=data_objects['data']
+#    data=[]
+#    for index in range(len(data_objects)):
+#        data_object=data_objects[index]
+#        data_object=[-1*data_object[0],-1*data_object[1],-1*data_object[2]]
+#        data.append(data_object)
+#    return data
 
 
 def create_colors(length_plot_window):

@@ -14,9 +14,12 @@ warnings.filterwarnings("error")
 
 from source.utils import create_colors
 
+px=1/plt.rcParams['figure.dpi']#TODO:magic
+resolution=(1980*px,1080*px)
+
 class GeometryPlayer3D:
     """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
-    def __init__(self,data_objects,data_objects_2):
+    def __init__(self,data_objects,data_objects_2,data_objects_3):
         
         self.switch=False
         self.fig=None
@@ -26,7 +29,7 @@ class GeometryPlayer3D:
         self.length_plot_window=len(data_objects_2)#TODO:only temporary
         self.colors=create_colors(self.length_plot_window)
 
-        curves=[Sequence(data_objects),Sequence(data_objects_2)]#later three_dimensional_player will not receive data_objects for curve this way
+        curves=[Sequence(data_objects_2),Sequence(data_objects), Sequence(data_objects_3)]#later three_dimensional_player will not receive data_objects for curve this way
         self.sequence_manager=SequenceManager(curves)
         self.previous_lim_change=None
         button_menu_reset,menu_buttons=self.register_button_menu_events()
@@ -37,17 +40,29 @@ class GeometryPlayer3D:
         #        ['Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],
         #        ['Help', 'About...'],]
         
-        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[button_list]], finalize=True,element_justification='c')
+        self.root = PySimpleGUI.Window(title="3D Result Player", layout=[[PySimpleGUI.Canvas(key="-CANVAS-")],[PySimpleGUI.Canvas(key="-CANVAS-ABS")],[button_list]], finalize=True,element_justification='c', resizable=True)
         self.create_figure()
-        self.register_mouse_events()
+        self.register_mouse_events()#for first figure
+        self.create_figure_abs()
+        self.register_mouse_events()#for second figure
+
+    def create_figure_abs(self):
+        self.fig_abs=plt.figure(figsize=(self.fig.get_figwidth(),2))#TODO:magic
+        self.abs_plot=self.fig_abs.add_subplot()
+        self.figure_abs_canvas_agg = FigureCanvasTkAgg(self.fig_abs, self.root["-CANVAS-ABS"].TKCanvas)
+        self.figure_abs_canvas_agg.draw()
+        self.figure_abs_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
 
     def create_figure(self):
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(projection='3d') #ax is a subplot
+        res=(resolution[0]*(28/30),resolution[1]*(2/3))
+        #res=(res[0],20*px)
+        self.fig = plt.figure(figsize=res)#TODO:magic
+        self.ax =self.fig.add_subplot(projection='3d') #ax is a subplot
         self.default_ax_setting()
         self.figure_canvas_agg = FigureCanvasTkAgg(self.fig, self.root["-CANVAS-"].TKCanvas)
         self.figure_canvas_agg.draw()
         self.figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
+
 
     def default_ax_setting(self):
         self.ax.set_xlabel("x")
@@ -57,9 +72,11 @@ class GeometryPlayer3D:
     
     def set_actual_plot(self):
         self.ax.cla() #clear ax
-        self.sequence_manager.set_actual_plot_data(self.ax, self.colors)
+        self.abs_plot.cla() #clear ax
+        self.sequence_manager.set_actual_plot_data(self.ax,self.abs_plot, self.colors)
         self.default_ax_setting()
         self.figure_canvas_agg.draw_idle()#TODO:neccessary?
+        self.figure_abs_canvas_agg.draw_idle()#TODO:neccessary?
 
     
     def run_figure(self):
@@ -163,8 +180,8 @@ class GeometryPlayer3D:
         print("pressed, coords",coords)
         self.ax.button_pressed = pressed
         print('you pressed', event.button, event.xdata, event.ydata, event.x, event.y,self.ax.format_coord(event.x,event.y))
-        
-        print("mouseevent occured on the line", self.sequence_manager.choose_sequence(event))
+        self.sequence_manager.choose_sequence(event)
+        print("mouseevent occured on the line", self.sequence_manager.choose_sequence, self.sequence_manager.chosen_data_object)
 
     def main_loop(self):
         while True:

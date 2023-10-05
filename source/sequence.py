@@ -1,5 +1,7 @@
 from source.dataobject import square_distance_between
 from source.dataobject import DataObject
+import math
+
 class Sequence:
     def __init__(self, input_objects):
         self.plot_data=None
@@ -49,6 +51,16 @@ class Sequence:
         if len(actual_point_list_x)>0:
             ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,\
                         c=color[start_list_index:start_list_index+len(actual_point_list_x)])    
+
+    def plot_sequence_abs_data(self,abs_plot, chosen_sequence, color):
+        min_sequence_length=min([len(self.plot_data),len(chosen_sequence.plot_data)])#TODO:bit ugly
+        xvals=[i for i in range(min_sequence_length)]#TODO:always the real numbers..., what are the original indices
+        if chosen_sequence==self:
+            yvals=[0]*len(self.plot_data)
+        else:
+            yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) for i in range(min_sequence_length) ]
+        return abs_plot.plot(xvals,yvals,linewidth=1, marker="o", c=color)
+
     def add_point(self):
         try:
             data_object = next(self.gen)
@@ -104,3 +116,38 @@ class Sequence:
                 continue
             vals.append(self.plot_data[index])
         self.plot_data=vals
+    
+    def compute_squared_distance_to(self,sequence):
+        min_sequence_length=min([len(self.plot_data),len(sequence.plot_data)])
+        for i in range(min_sequence_length):
+            distance=square_distance_between(self.plot_data[i],sequence.plot_data[i]) 
+            self.distance_dict[sequence.plot_data[i]]={self.plot_data[i]:distance}
+
+    def generate_dict_entry_in_other(self,other_sequence,i):
+        #runtime may be better with generatigng other sequence data with resprect to chosen sequence
+        if self.plot_data[i] not in other_sequence.distance_dict.keys():
+            new_value=square_distance_between(self.plot_data[i],other_sequence.plot_data[i]) 
+            other_sequence.distance_dict[self.plot_data[i]]={other_sequence.plot_data[i]:new_value}
+            return new_value
+        elif self.plot_data[i] in other_sequence.distance_dict.keys() and \
+            other_sequence.plot_data[i] not in other_sequence.distance_dict[self.plot_data[i]].keys():
+            new_value=square_distance_between(self.plot_data[i],other_sequence.plot_data[i]) 
+            other_sequence.distance_dict[self.plot_data[i]][other_sequence.plot_data[i]]=new_value
+            return new_value
+        else:
+            return other_sequence.distance_dict[self.plot_data[i]][other_sequence.plot_data[i]]
+
+
+def get_squared_distance_between_sequences(self_sequence:Sequence,chosen_sequence:Sequence,i:int):
+    if i >=min([len(chosen_sequence.plot_data), len(self_sequence.plot_data)]) or i <0:
+        raise Exception(f"{i} is not in valid range")
+    if self_sequence.distance_dict=={} and chosen_sequence.distance_dict=={}:
+        chosen_sequence.compute_squared_distance_to(self_sequence)
+        return chosen_sequence.distance_dict[self_sequence.plot_data[i]][chosen_sequence.plot_data[i]]
+        #generate data in chosen
+        
+    if self_sequence.distance_dict!={}:
+        return chosen_sequence.generate_dict_entry_in_other(self_sequence,i)
+    
+    if chosen_sequence.distance_dict!={}:
+        return self_sequence.generate_dict_entry_in_other(chosen_sequence,i)
