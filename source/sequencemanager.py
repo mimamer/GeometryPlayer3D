@@ -2,22 +2,26 @@ from source.sequence import Sequence
 from matplotlib.lines import Line2D
 import math
 from source.dataobject import square_distance_between
+from source.utils import create_colors
 class SequenceManager:
-    def __init__(self,curves : list[Sequence] = None):
+    def __init__(self,input_sequences : list[Sequence] = None):
         self.tmp_index=0
         self.total_index=0
         self.zoom_factor=0
         
-        if curves is None:
+        if input_sequences is None:
             self.sequences=[]
         else:
-            self.sequences=curves
+            self.sequences=input_sequences
+
+        self.length_plot_window=self.sequences[2].total_length#TODO:only temporary
+        self.colors=create_colors(self.length_plot_window)
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
         #TODO:refactor this stuff
         self.chosen_sequence=self.sequences[0]
         self.chosen_data_object=None#self.chosen_sequence.data_objects[2]
-        self.hover_sequence_index=self.sequences[0]
+        self.hover_sequence=self.sequences[0]
         self.hover_data_object=None#self.chosen_sequence.data_objects[2]
 
     def is_empty_plot(self) -> bool:
@@ -65,7 +69,7 @@ class SequenceManager:
         if self.hover_data_object is not None:#TODO:hover data object is reset to none, may not pretty
             self.hover_data_object=None
             self.hover_index=None
-            self.hover_sequence_index=None
+            self.hover_sequence=None
 
         for index in range(len(self.sequences)):
             if not self.sequences[index].is_empty() and sq_dist_values[index]!=-1 and max_value==sq_dist_values[index]:
@@ -118,10 +122,10 @@ class SequenceManager:
         min_dist=None
         chosen_sequence=None
 
-        for index in range(len(self.abs_line)):#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
-            xvals,yvals=self.abs_line[index].get_data()[0],self.abs_line[index].get_data()[1]
+        for index in range(len(self.dist_lines)):#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
+            xvals,yvals=self.dist_lines[index][0],self.dist_lines[index][1]
             print(xvals,yvals)
-            if yvals.size==0:#TODO:could be a probem if only one is left
+            if len(yvals)==0:#TODO:could be a probem if only one is left
                 print("yvals are not right (xvals,yvals)", xvals,yvals)
                 continue
             else:
@@ -155,45 +159,55 @@ class SequenceManager:
 
     def set_hover_object(self,hover_seq,index):
         if hover_seq is not None:
-            self.hover_sequence_index=hover_seq
+            self.hover_sequence=hover_seq
             self.hover_data_object=self.sequences[hover_seq].data_objects[index]#one can choose a not visible object...
             self.hover_index=index
 
             
-    def set_actual_plot_data_3d(self,ax,colors):
+    def get_plot_data_3d(self):
         if self.is_empty_plot():
             return
+        result=[]
         for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
-                sequence.plot_sequence_data(ax,colors[index])
+                if sequence==self.chosen_sequence:
+                    result.append(sequence.plot_sequence_data(self.colors[index], self.chosen_data_object))
+                elif sequence==self.hover_sequence:
+                    result.append(sequence.plot_sequence_data(self.colors[index], self.hover_data_object))
+        return result
 
-    def set_actual_plot_distance_data(self,abs_plot,colors):
+    
+    def compute_dist_lines(self):
         if self.is_empty_plot():
             return
-        self.abs_line : list[Line2D]=list()
+        self.dist_lines =list()
         for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
                 #TODO:next function is ugly
-                line2d:Line2D=sequence.plot_sequence_abs_data(abs_plot,self.chosen_sequence,colors[index][int(len(colors[index])/2)])[0]
-                self.abs_line.append(line2d)
+                xvals,yvals=sequence.get_plot_sequence_distance_data(self.chosen_sequence)
+                self.dist_lines.append([xvals,yvals,self.colors[index][int(len(self.colors[index])/2)]])#TODO:color...#
 
-    def set_actual_chosen_data_object_3d(self,ax):
+
+    def get_plot_distance_data(self):
+        return self.dist_lines
+
+    def get_chosen_data_object_3d(self):
         if self.chosen_data_object is not None:
-            self.chosen_data_object.plot_data_object(ax,'fuchsia', markersize=10)
+            return self.chosen_data_object.get_plot_data_object('fuchsia')
 
-    def set_actual_chosen_data_object_distance(self,abs_plot):
+    def get_chosen_data_object_distance(self):
         if self.chosen_data_object is not None:
-            abs_plot.plot(self.chosen_index,0, marker="o", c='fuchsia')
+            return self.chosen_index
 
-    def set_actual_hover_data_object_3d(self,ax):
+    def get_hover_data_object_3d(self):
           if self.hover_data_object is not None:
-            self.hover_data_object.plot_data_object(ax,'aqua', markersize=10)#TODO return make it a getter?
+            return self.hover_data_object.get_plot_data_object('aqua')#TODO return make it a getter?
 
-    def set_actual_hover_data_object_distance(self,abs_plot):
+    def get_hover_data_object_distance(self):
         if self.hover_data_object is not None:
-            abs_plot.plot(self.hover_index,
-                        math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object)),
-                        marker="o", c='aqua')
+            return self.hover_index, \
+                math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object))
+        return None,None
 
     def jump_to_start(self):
         return

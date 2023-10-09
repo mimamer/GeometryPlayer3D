@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from source.sequencemanager import SequenceManager
+import mpl_toolkits
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 px=1/plt.rcParams['figure.dpi']#TODO:magic
 resolution=(1980*px,1080*px)
@@ -16,11 +19,25 @@ class Plot3D:
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=1)
     
-    def update(self, sequence_manager,colors):
+    def update(self, sequence_manager:SequenceManager):
         self.plot.cla()
-        sequence_manager.set_actual_plot_data_3d(self.plot,colors)
-        sequence_manager.set_actual_chosen_data_object_3d(self.plot)
-        sequence_manager.set_actual_hover_data_object_3d(self.plot)
+        plot_data_3d=sequence_manager.get_plot_data_3d()
+        self.handle_plot_data(plot_data_3d)
+        chosen_dict=sequence_manager.get_chosen_data_object_3d()
+        if chosen_dict is not None: 
+            if "line_collection" in chosen_dict.keys():
+                self.plot.add_collection3d(chosen_dict["line_collection"])#TODO:if line collection to small other kind of plotting
+            else:
+                self.plot.scatter(chosen_dict["xs"],chosen_dict["ys"],chosen_dict["zs"],s=7, depthshade=False,
+                                   marker="o", c='fuchsia')
+        
+        hover_dict=sequence_manager.get_hover_data_object_3d()
+        if hover_dict is not None:#TODO:function with color argument line 27-33 and 34-40 are almost the same
+            if "line_collection" in hover_dict.keys():
+                self.plot.add_collection3d(hover_dict["line_collection"])#TODO:if line collection to small other kind of plotting
+            else:
+                self.plot.scatter(hover_dict["xs"],hover_dict["ys"],hover_dict["zs"],
+                            depthshade=False,s=7,marker="o", c='aqua')
         self.set_default_plot_labels()
         self.canvas.draw_idle()
         self.canvas.flush_events()
@@ -51,3 +68,21 @@ class Plot3D:
         self.plot.set_xlabel("x")
         self.plot.set_ylabel("y")
         self.plot.set_zlabel("z")
+
+    def handle_plot_data(self, plot_data_3d):
+        for sequence in plot_data_3d:
+            for dict_elem in sequence:
+                if "line_collection" in dict_elem.keys():
+                    self.plot.add_collection3d(dict_elem["line_collection"])
+                    #if not visible plot as squares
+                else:
+                    self.plot.scatter(xs=dict_elem["xs"],
+                            ys=dict_elem["ys"],
+                            zs=dict_elem["zs"],
+                            depthshade=False,
+                            s=5,
+                            c=dict_elem["color"],
+                            marker="o")
+        #TODO:if line collection to small other kind of plotting
+        #if self.width_x/ax_width<is_visible_factor \
+        #self.plot.set_xlim()

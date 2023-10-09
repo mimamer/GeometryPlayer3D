@@ -7,6 +7,7 @@ class Sequence:
         self.plot_data=None
         self.data_objects=[]
         self.gen  = self.next_value(input_objects)
+        self.total_length=len(input_objects)
         self.distance_dict={}
         self.scope=[]
 
@@ -18,50 +19,50 @@ class Sequence:
             self.plot_data=self.data_objects[:tmp_index]
             self.scope=[i for i in range(tmp_index)]
 
-    def plot_sequence_data(self,ax,color):
+    def plot_sequence_data(self,color, jump_over_object=None):
         #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
         actual_point_list_x=[]
         actual_point_list_y=[]
         actual_point_list_z=[]
         start_list_index=0
         index=0
-        plot_first_linecollection3d=True
-        plot_contains_points=False
+        result_list=[]
         while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming (mehr als eine Zusammenhangskomponente)
+            if jump_over_object==self.plot_data[index]:
+                index+=1
+                continue
             if self.plot_data[index].is_vertex:
                 actual_point_list_x.append(self.plot_data[index].data[0])
                 actual_point_list_y.append(self.plot_data[index].data[1])
                 actual_point_list_z.append(self.plot_data[index].data[2])
-                plot_contains_points=True
             else:#LineCollection3D
-                if plot_first_linecollection3d and not plot_contains_points:#problem if all the points come after this stuff...
-                    #TODO:have to do this after all points are plotted , create testdata first
-                    # -> cuboids need to be plotted later, remember color in "cuboid list" eg.
-                    print("Tighten ax lims")
-                    ax.set_xlim((self.plot_data[index].min_lims[0],self.plot_data[index].max_lims[0]))
-                    ax.set_ylim((self.plot_data[index].min_lims[1],self.plot_data[index].max_lims[1]))
-                    ax.set_zlim((self.plot_data[index].min_lims[2],self.plot_data[index].max_lims[2]))
-                plot_first_linecollection3d=False
                 if len(actual_point_list_x)>0:
-                    ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,s=7, c=color[start_list_index:len(actual_point_list_x)])
+                    zws_dict={"xs":actual_point_list_x,
+                            "ys": actual_point_list_y,
+                            "zs": actual_point_list_z,
+                            "color": color[start_list_index:len(actual_point_list_x)]}
+                    result_list.append(zws_dict)
                     actual_point_list_x=[]
                     actual_point_list_y=[]
                     actual_point_list_z=[]
-                    start_list_index=index+1
-                self.plot_data[index].plot_data_object(ax,color[index])
-                
+                start_list_index=index+1
+                result_list.append(self.plot_data[index].get_plot_data_object(color[index]))
             index+=1
         if len(actual_point_list_x)>0:
-            ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, s=7,depthshade=False,\
-                        c=color[start_list_index:start_list_index+len(actual_point_list_x)])    
+            zws_dict={"xs":actual_point_list_x,
+                    "ys": actual_point_list_y,
+                    "zs": actual_point_list_z,
+                    "color": color[start_list_index:len(actual_point_list_x)]}
+            result_list.append(zws_dict)
+        return result_list
 
-    def plot_sequence_abs_data(self,abs_plot, chosen_sequence, color):#TODO:generate values before, more getting 
+    def get_plot_sequence_distance_data(self, chosen_sequence):#TODO:generate values before, more getting 
         xvals : list[int] = list(set(self.scope).intersection(set(chosen_sequence.scope)))#TODO:scope nur einfaerben statt zoom? Verhalten eval.
         if chosen_sequence==self:
             yvals=[0]*len(xvals)
         else:
             yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) for i in xvals]
-        return abs_plot.plot(xvals,yvals,linewidth=1, marker="o", c=color)#last line ok but computation should not be here
+        return xvals,yvals #TODO: last line ok but computation should not be here
 
     def add_point(self):
         try:
@@ -84,7 +85,6 @@ class Sequence:
     def get_sequence_plot_data(self):
         return self.plot_data
 
-    #TODO: dynamisch, lege pro sequenz distance-dir an: ref_0(chosen): { ref_1: wert_1, ref_2: wert_2 usw}
     def get_max_squared_dist_value(self,chosen_data_object):
         if self.distance_dict =={} or chosen_data_object not in self.distance_dict.keys():
             distance_dict_for_chosen={}
@@ -121,7 +121,7 @@ class Sequence:
             vals.append(self.plot_data[index])
         self.scope=scope_vals
         self.plot_data=vals
-    
+    #TODO: bit evil
     def compute_squared_distance_to(self,sequence):
         min_sequence_length=min([len(self.data_objects),len(sequence.data_objects)])
         for i in range(min_sequence_length):
@@ -129,7 +129,7 @@ class Sequence:
             self.distance_dict[sequence.data_objects[i]]={self.data_objects[i]:distance}
 
     def generate_dict_entry_in_other(self,other_sequence,i):
-        #runtime may be better with generatigng other sequence data with resprect to chosen sequence
+        #runtime may be better with generating other sequence data with respect to chosen sequence
         if self.data_objects[i] not in other_sequence.distance_dict.keys():
             new_value=square_distance_between(self.data_objects[i],other_sequence.data_objects[i]) 
             other_sequence.distance_dict[self.data_objects[i]]={other_sequence.data_objects[i]:new_value}

@@ -40,21 +40,19 @@ class DataObject:
         return self.max_lims[0]-self.min_lims[0],self.max_lims[1]-self.min_lims[1],self.max_lims[2]-self.min_lims[2]
 
 
-    def plot_data_object(self,ax=None,color="blue", markersize=5):
+    def get_plot_data_object(self,color):
         if self.is_vertex:
-            ax.scatter(xs=self.data[0], ys=self.data[1],  zs=self.data[2], depthshade=False, s=markersize,c=color)
+            return {"xs":self.data[0],
+                    "ys": self.data[1],
+                    "zs": self.data[2],
+                    "color":color}
         else:
-            ax_width=ax.get_xlim()[1]-ax.get_xlim()[0]
-            ax_height=ax.get_ylim()[1]-ax.get_ylim()[0]
-            ax_depth=ax.get_zlim()[1]-ax.get_zlim()[0]
-
-            if self.width_x/ax_width<is_visible_factor \
-                and self.height_y/ax_height<is_visible_factor \
-                and self.depth_z/ax_depth<is_visible_factor :
-                ax.scatter(xs=self.data[0][0][0], ys=self.data[0][0][1],  zs=self.data[0][0][2], depthshade=False,s=markersize, c=color, marker="s")
-            else:
-                ax.add_collection3d(Line3DCollection(self.data,edgecolor=color))
-                self.widening_ax_lims(ax)
+            return {"line_collection":Line3DCollection(self.data,edgecolor=color),
+                    "min_lims":self.min_lims,
+                    "max_lims":self.max_lims,
+                    "width_x": self.width_x,
+                    "height_y": self.height_y,
+                    "depth_z": self.depth_z}
 
     def widening_ax_lims(self,ax):# only widening
         if ax.get_xlim()[0] > self.min_lims[0]:

@@ -5,13 +5,10 @@ from source.plot3d import Plot3D
 from source.plotdistance import PlotDistance
 from source.sequence import Sequence
 from source.sequencemanager import SequenceManager
-from source.buttonevent import ButtonEvent
+from source.eventbinder import EventBinder
 from matplotlib.backend_bases import MouseButton
 matplotlib.use("TkAgg")
-import warnings
-warnings.filterwarnings("error")
-from source.utils import create_colors
-from source.eventbinder import EventBinder
+
 
 class GeometryPlayer3D:
     """The GeometryPlayer3D Class builds the main window and delegates the processing of events. """
@@ -21,13 +18,9 @@ class GeometryPlayer3D:
         self.plot_3d:Plot3D=Plot3D()
         self.plot_distance: PlotDistance=PlotDistance()
 
-        self.length_plot_window=len(data_objects_2)#TODO:only temporary
-        self.colors=create_colors(self.length_plot_window)
-
         curves=[Sequence(data_objects_2),Sequence(data_objects), Sequence(data_objects_3)]
         #later three_dimensional_player will not receive data_objects for curve this way
-        self.sequence_manager=SequenceManager(curves)
-
+        self.sequence_manager:SequenceManager=SequenceManager(curves)
         self.event_binder:EventBinder=EventBinder(self.plot_3d, self.sequence_manager)
 
         #menu_def = [['File', ['Open', 'Save', 'Exit',]],
@@ -47,8 +40,8 @@ class GeometryPlayer3D:
         self.register_mouse_events()#TODO: a bit inconsequent
     
     def update_plot(self) -> None:
-        self.plot_3d.update(self.sequence_manager,self.colors)
-        self.plot_distance.update(self.sequence_manager,self.colors)
+        self.plot_3d.update(self.sequence_manager)
+        self.plot_distance.update(self.sequence_manager)
 
     def run_figure(self) -> None:
         if self.switch:
@@ -70,12 +63,12 @@ class GeometryPlayer3D:
                 self.switch=False
                 self_event.trigger_command()
                 self.update_plot()
-    
-    def register_mouse_events(self):
-        self.plot_3d.canvas.mpl_connect('scroll_event', self.on_scroll)
-        self.plot_distance.canvas.mpl_connect('button_press_event', self.on_press)
 
-    def on_scroll(self,event):
+    def register_mouse_events(self):
+        self.plot_3d.canvas.mpl_connect('scroll_event', self.trigger_scroll_events)
+        self.plot_distance.canvas.mpl_connect('button_press_event', self.trigger_press_events)
+
+    def trigger_scroll_events(self,event):
         if event.button=="up":
             self.switch=False
             self.sequence_manager.zoom_in()
@@ -85,10 +78,11 @@ class GeometryPlayer3D:
             self.sequence_manager.zoom_out()
             self.update_plot()
 
-    def on_press(self,event):
+    def trigger_press_events(self,event):
         if event.inaxes:
             if event.button==MouseButton.LEFT:
                 sequence,index=self.sequence_manager.choose_sequence(event)
+                print(sequence,index)
                 self.sequence_manager.set_chosen_object(sequence, index)
                 self.update_plot()
             elif event.button==MouseButton.RIGHT:

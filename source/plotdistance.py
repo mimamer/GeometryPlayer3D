@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from source.sequencemanager import SequenceManager
+
 
 px=1/plt.rcParams['figure.dpi']#TODO:magic
 resolution=(1980*px,1080*px)
@@ -14,11 +16,29 @@ class PlotDistance():
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=1)
 
 
-    def update(self, sequence_manager, colors):
+    def update(self, sequence_manager:SequenceManager):
         self.plot.cla() #clear ax
-        sequence_manager.set_actual_plot_distance_data(self.plot,colors)
-        sequence_manager.set_actual_chosen_data_object_distance(self.plot)
-        sequence_manager.set_actual_hover_data_object_distance(self.plot)
+        sequence_manager.compute_dist_lines()
+        plot_data_dist=sequence_manager.get_plot_distance_data()
+        self.handle_plot_data(plot_data_dist)
+        chosen_index=sequence_manager.get_chosen_data_object_distance()
+        if chosen_index is not None:       
+            self.plot.plot(chosen_index,0, marker="o", c='fuchsia')
+        
+        hover_index, hover_y=sequence_manager.get_hover_data_object_distance()
+        if hover_index is not None:
+            self.plot.plot(hover_index,
+                        hover_y,
+                        marker="o", c='aqua')
         self.canvas.draw_idle()
         self.canvas.flush_events()
+
+    def handle_plot_data(self,plot_data_dist):
+        if plot_data_dist is None:
+            return
+        for line in plot_data_dist:
+            self.plot.plot(line[0],line[1],linewidth=1, marker="o", c=line[2])
+
+
+
 
