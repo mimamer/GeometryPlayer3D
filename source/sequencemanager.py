@@ -159,28 +159,41 @@ class SequenceManager:
             self.hover_data_object=self.sequences[hover_seq].data_objects[index]#one can choose a not visible object...
             self.hover_index=index
 
-
             
-    def set_actual_plot_data(self,ax,abs_plot,colors):
+    def set_actual_plot_data_3d(self,ax,colors):
         if self.is_empty_plot():
             return
         for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
                 sequence.plot_sequence_data(ax,colors[index])
+
+    def set_actual_plot_distance_data(self,abs_plot,colors):
+        if self.is_empty_plot():
+            return
         self.abs_line : list[Line2D]=list()
         for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
                 #TODO:next function is ugly
                 line2d:Line2D=sequence.plot_sequence_abs_data(abs_plot,self.chosen_sequence,colors[index][int(len(colors[index])/2)])[0]
                 self.abs_line.append(line2d)
+
+    def set_actual_chosen_data_object_3d(self,ax):
         if self.chosen_data_object is not None:
             self.chosen_data_object.plot_data_object(ax,'fuchsia', markersize=10)
+
+    def set_actual_chosen_data_object_distance(self,abs_plot):
+        if self.chosen_data_object is not None:
             abs_plot.plot(self.chosen_index,0, marker="o", c='fuchsia')
+
+    def set_actual_hover_data_object_3d(self,ax):
+          if self.hover_data_object is not None:
+            self.hover_data_object.plot_data_object(ax,'aqua', markersize=10)#TODO return make it a getter?
+
+    def set_actual_hover_data_object_distance(self,abs_plot):
         if self.hover_data_object is not None:
-            self.hover_data_object.plot_data_object(ax,'aqua', markersize=10)
-            abs_plot.plot(self.hover_index,math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object)) , marker="o", c='aqua')
-
-
+            abs_plot.plot(self.hover_index,
+                        math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object)),
+                        marker="o", c='aqua')
 
     def jump_to_start(self):
         return

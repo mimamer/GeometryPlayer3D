@@ -1,5 +1,6 @@
 ./test_data/*
 .vscode
 *.csv
+*.png
 **/__pycache__/**
-./bugs/**
+./bugs/*

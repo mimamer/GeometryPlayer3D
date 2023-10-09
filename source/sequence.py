@@ -70,7 +70,6 @@ class Sequence:
         except StopIteration as stop:
             raise stop
 
-
     def next_value(self,input_objects):
         for i in range(len(input_objects)):
             try:
