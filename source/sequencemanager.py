@@ -1,5 +1,7 @@
 from source.sequence import Sequence
 from matplotlib.lines import Line2D
+import math
+from source.dataobject import square_distance_between
 class SequenceManager:
     def __init__(self,curves : list[Sequence] = None):
         self.tmp_index=0
@@ -12,17 +14,19 @@ class SequenceManager:
             self.sequences=curves
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
+        #TODO:refactor this stuff
         self.chosen_sequence=self.sequences[0]
         self.chosen_data_object=None#self.chosen_sequence.data_objects[2]
+        self.hover_sequence_index=self.sequences[0]
+        self.hover_data_object=None#self.chosen_sequence.data_objects[2]
 
-
-    def is_empty_plot(self):
+    def is_empty_plot(self) -> bool:
         for curve in self.sequences:
             if not curve.is_empty():
                 return False
         return True
         
-    def get_sequence_data(self,index):
+    def get_sequence_data(self,index:int):
         return self.sequences[index].get_curve_plot_data()
     
     def zoom_out(self):
@@ -55,9 +59,16 @@ class SequenceManager:
             if not sequence.is_empty():
                 value=sequence.get_max_squared_dist_value(self.chosen_data_object)
                 sq_dist_values.append(value)
+            else:
+                sq_dist_values.append(-1)#default, since -1 is an impossible value
         max_value=max(sq_dist_values)
+        if self.hover_data_object is not None:#TODO:hover data object is reset to none, may not pretty
+            self.hover_data_object=None
+            self.hover_index=None
+            self.hover_sequence_index=None
+
         for index in range(len(self.sequences)):
-            if not self.sequences[index].is_empty() and max_value==sq_dist_values[index]:
+            if not self.sequences[index].is_empty() and sq_dist_values[index]!=-1 and max_value==sq_dist_values[index]:
                 self.sequences[index].set_plot_data_to_radius()#TODO:rename?
         self.zoom_factor+=1
 
@@ -102,12 +113,27 @@ class SequenceManager:
 
     def choose_sequence(self,event):
         index_chosen=int(round(event.xdata,0))
+        if max(event.xdata,index_chosen)-min(event.xdata,index_chosen)>=0.5:
+            return None,None
         min_dist=None
         chosen_sequence=None
 
-        for index in range(len(self.abs_line)):
-            yvals=self.abs_line[index].get_data()[1]
-            yval=yvals[index_chosen]
+        for index in range(len(self.abs_line)):#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
+            xvals,yvals=self.abs_line[index].get_data()[0],self.abs_line[index].get_data()[1]
+            print(xvals,yvals)
+            if yvals.size==0:#TODO:could be a probem if only one is left
+                print("yvals are not right (xvals,yvals)", xvals,yvals)
+                continue
+            else:
+                y_index=None
+                for i in range(len(xvals)):
+                    if index_chosen==xvals[i]:
+                        y_index=i
+                        break
+                if y_index==None:
+                    continue
+                yval=yvals[y_index]
+                print("Yval and index",yval,y_index)
             current_abs=yval-event.ydata
             if yval < event.ydata:
                 current_abs=event.ydata-yval
@@ -115,10 +141,25 @@ class SequenceManager:
             if min_dist is None or min_dist>current_abs:
                 min_dist=current_abs
                 chosen_sequence=index
-        
-        self.chosen_sequence=self.sequences[chosen_sequence]
-        self.chosen_data_object=self.chosen_sequence.data_objects[index_chosen]
-        
+                y_index_star=y_index
+
+        if min_dist is None or min_dist>=0.5:
+            return None,None, None
+        return chosen_sequence, y_index_star
+    
+    def set_chosen_object(self,chosen_sequence, index_chosen):
+        if chosen_sequence is not None and index_chosen is not None:
+            self.chosen_sequence=self.sequences[chosen_sequence]
+            self.chosen_data_object=self.chosen_sequence.data_objects[index_chosen]#one can choose a not visible object...
+            self.chosen_index=index_chosen
+
+    def set_hover_object(self,hover_seq,index):
+        if hover_seq is not None:
+            self.hover_sequence_index=hover_seq
+            self.hover_data_object=self.sequences[hover_seq].data_objects[index]#one can choose a not visible object...
+            self.hover_index=index
+
+
             
     def set_actual_plot_data(self,ax,abs_plot,colors):
         if self.is_empty_plot():
@@ -129,9 +170,16 @@ class SequenceManager:
         self.abs_line : list[Line2D]=list()
         for index in range(len(self.sequences)):
                 sequence=self.sequences[index]
+                #TODO:next function is ugly
                 line2d:Line2D=sequence.plot_sequence_abs_data(abs_plot,self.chosen_sequence,colors[index][int(len(colors[index])/2)])[0]
                 self.abs_line.append(line2d)
-        
+        if self.chosen_data_object is not None:
+            self.chosen_data_object.plot_data_object(ax,'fuchsia', markersize=10)
+            abs_plot.plot(self.chosen_index,0, marker="o", c='fuchsia')
+        if self.hover_data_object is not None:
+            self.hover_data_object.plot_data_object(ax,'aqua', markersize=10)
+            abs_plot.plot(self.hover_index,math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object)) , marker="o", c='aqua')
+
 
 
     def jump_to_start(self):

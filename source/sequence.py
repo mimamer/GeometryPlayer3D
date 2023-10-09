@@ -8,12 +8,15 @@ class Sequence:
         self.data_objects=[]
         self.gen  = self.next_value(input_objects)
         self.distance_dict={}
+        self.scope=[]
 
     def reset_to_actual_points(self,tmp_index):
         if tmp_index>=len(self.data_objects):
             self.plot_data=self.data_objects[:len(self.data_objects)]
+            self.scope= [i for i in range(len(self.data_objects))]
         else:
             self.plot_data=self.data_objects[:tmp_index]
+            self.scope=[i for i in range(tmp_index)]
 
     def plot_sequence_data(self,ax,color):
         #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
@@ -40,7 +43,7 @@ class Sequence:
                     ax.set_zlim((self.plot_data[index].min_lims[2],self.plot_data[index].max_lims[2]))
                 plot_first_linecollection3d=False
                 if len(actual_point_list_x)>0:
-                    ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False, c=color[start_list_index:len(actual_point_list_x)])
+                    ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,s=7, c=color[start_list_index:len(actual_point_list_x)])
                     actual_point_list_x=[]
                     actual_point_list_y=[]
                     actual_point_list_z=[]
@@ -49,17 +52,16 @@ class Sequence:
                 
             index+=1
         if len(actual_point_list_x)>0:
-            ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, depthshade=False,\
+            ax.scatter(xs=actual_point_list_x, ys=actual_point_list_y,  zs=actual_point_list_z, s=7,depthshade=False,\
                         c=color[start_list_index:start_list_index+len(actual_point_list_x)])    
 
-    def plot_sequence_abs_data(self,abs_plot, chosen_sequence, color):
-        min_sequence_length=min([len(self.plot_data),len(chosen_sequence.plot_data)])#TODO:bit ugly
-        xvals=[i for i in range(min_sequence_length)]#TODO:always the real numbers..., what are the original indices
+    def plot_sequence_abs_data(self,abs_plot, chosen_sequence, color):#TODO:generate values before, more getting 
+        xvals : list[int] = list(set(self.scope).intersection(set(chosen_sequence.scope)))#TODO:scope nur einfaerben statt zoom? Verhalten eval.
         if chosen_sequence==self:
-            yvals=[0]*len(self.plot_data)
+            yvals=[0]*len(xvals)
         else:
-            yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) for i in range(min_sequence_length) ]
-        return abs_plot.plot(xvals,yvals,linewidth=1, marker="o", c=color)
+            yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) for i in xvals]
+        return abs_plot.plot(xvals,yvals,linewidth=1, marker="o", c=color)#last line ok but computation should not be here
 
     def add_point(self):
         try:
@@ -111,39 +113,43 @@ class Sequence:
     
     def set_plot_data_to_radius(self):
         vals=[]
-        for index in range(len(self.plot_data)):
+        scope_vals=[]
+        for index in range(len(self.plot_data)):#should be length of scope as well, scope are the 'real indices of plot_data' 
+            # TODO:testing
             if index in self.delete_list:
                 continue
+            scope_vals.append(self.scope[index])
             vals.append(self.plot_data[index])
+        self.scope=scope_vals
         self.plot_data=vals
     
     def compute_squared_distance_to(self,sequence):
-        min_sequence_length=min([len(self.plot_data),len(sequence.plot_data)])
+        min_sequence_length=min([len(self.data_objects),len(sequence.data_objects)])
         for i in range(min_sequence_length):
-            distance=square_distance_between(self.plot_data[i],sequence.plot_data[i]) 
-            self.distance_dict[sequence.plot_data[i]]={self.plot_data[i]:distance}
+            distance=square_distance_between(self.data_objects[i],sequence.data_objects[i]) 
+            self.distance_dict[sequence.data_objects[i]]={self.data_objects[i]:distance}
 
     def generate_dict_entry_in_other(self,other_sequence,i):
         #runtime may be better with generatigng other sequence data with resprect to chosen sequence
-        if self.plot_data[i] not in other_sequence.distance_dict.keys():
-            new_value=square_distance_between(self.plot_data[i],other_sequence.plot_data[i]) 
-            other_sequence.distance_dict[self.plot_data[i]]={other_sequence.plot_data[i]:new_value}
+        if self.data_objects[i] not in other_sequence.distance_dict.keys():
+            new_value=square_distance_between(self.data_objects[i],other_sequence.data_objects[i]) 
+            other_sequence.distance_dict[self.data_objects[i]]={other_sequence.data_objects[i]:new_value}
             return new_value
-        elif self.plot_data[i] in other_sequence.distance_dict.keys() and \
-            other_sequence.plot_data[i] not in other_sequence.distance_dict[self.plot_data[i]].keys():
-            new_value=square_distance_between(self.plot_data[i],other_sequence.plot_data[i]) 
-            other_sequence.distance_dict[self.plot_data[i]][other_sequence.plot_data[i]]=new_value
+        elif self.data_objects[i] in other_sequence.distance_dict.keys() and \
+            other_sequence.data_objects[i] not in other_sequence.distance_dict[self.data_objects[i]].keys():
+            new_value=square_distance_between(self.data_objects[i],other_sequence.data_objects[i]) 
+            other_sequence.distance_dict[self.data_objects[i]][other_sequence.data_objects[i]]=new_value
             return new_value
         else:
-            return other_sequence.distance_dict[self.plot_data[i]][other_sequence.plot_data[i]]
+            return other_sequence.distance_dict[self.data_objects[i]][other_sequence.data_objects[i]]
 
 
 def get_squared_distance_between_sequences(self_sequence:Sequence,chosen_sequence:Sequence,i:int):
-    if i >=min([len(chosen_sequence.plot_data), len(self_sequence.plot_data)]) or i <0:
+    if i >=min([len(chosen_sequence.data_objects), len(self_sequence.data_objects)]) or i <0:
         raise Exception(f"{i} is not in valid range")
     if self_sequence.distance_dict=={} and chosen_sequence.distance_dict=={}:
         chosen_sequence.compute_squared_distance_to(self_sequence)
-        return chosen_sequence.distance_dict[self_sequence.plot_data[i]][chosen_sequence.plot_data[i]]
+        return chosen_sequence.distance_dict[self_sequence.data_objects[i]][chosen_sequence.data_objects[i]]
         #generate data in chosen
         
     if self_sequence.distance_dict!={}:
