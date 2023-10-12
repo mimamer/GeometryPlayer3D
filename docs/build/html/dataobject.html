@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>dataobject &#8212; GeometryPlayer3D  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="plot3d" href="plot3d.html" />
+    <link rel="prev" title="sequence" href="sequence.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="dataobject">
+<h1>dataobject<a class="headerlink" href="#dataobject" title="Link to this heading">¶</a></h1>
+<p>Contains the class <cite>DataObject</cite> and static methods with DataObjects as parameters
+and possible auxiliary functions.</p>
+</section>
+<section id="id1">
+<h1>DataObject<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="DataObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DataObject</span></span><a class="headerlink" href="#DataObject" title="Link to this definition">¶</a></dt>
+<dd><p>The <cite>DataObject</cite> class contains the data of the objects, that are plotted.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="is_vertex">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_vertex</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#is_vertex" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="DataObject.__init__">
+<span class="sig-prename descclassname"><span class="pre">DataObject.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataObject.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Builds the GUI with event binding and
+empty plots. Return value is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#DataObject" title="DataObject"><em>DataObject</em></a>) – non-static method</p></li>
+<li><p><strong>data</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>list</em><em>[</em><em>float</em><em>]</em><em>]</em><em>]</em>) – data is a list of object data.
+Object data is ether a one-element list with a
+list of floats (modelling a 3D point)
+or a list of segment lists, each containing
+two lists with floats (modelling a line in 3D space).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New DataObject, which contains
+the information of the input data and resulting properties.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#DataObject" title="DataObject">DataObject</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="get_plot_data_object">
+<span class="sig-name descname"><span class="pre">get_plot_data_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#get_plot_data_object" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="square_distance_between">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">square_distance_between</span></span><span class="sig-paren">[</span><em class="sig-param"><span class="n"><span class="pre">DataObject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DataObject</span></span></em><span class="sig-paren">]</span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#square_distance_between" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GeometryPlayer3D</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="geometryplayer3d.html">GeometryPlayer3D</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequencemanager.html">sequencemanager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequence.html">sequence</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">dataobject</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#id1">DataObject</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#DataObject"><code class="docutils literal notranslate"><span class="pre">DataObject</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#DataObject.__init__"><code class="docutils literal notranslate"><span class="pre">DataObject.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#is_vertex"><code class="docutils literal notranslate"><span class="pre">is_vertex</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get_plot_data_object"><code class="docutils literal notranslate"><span class="pre">get_plot_data_object()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#square_distance_between"><code class="docutils literal notranslate"><span class="pre">square_distance_between()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">plot3d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotdistance.html">plotdistance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="buttonevent.html">buttonevent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eventbinder.html">eventbinder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">main</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="sequence.html" title="previous chapter">sequence</a></li>
+      <li>Next: <a href="plot3d.html" title="next chapter">plot3d</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Michelle Marie Mergen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/dataobject.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

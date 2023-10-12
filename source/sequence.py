@@ -6,8 +6,9 @@ class Sequence:
     def __init__(self, input_objects):
         self.plot_data=None
         self.data_objects=[]
-        self.gen  = self.next_value(input_objects)
-        self.total_length=len(input_objects)
+        self.input_objects=input_objects
+        self.gen  = self.next_value()
+        self.total_length=len(self.input_objects)
         self.distance_dict={}
         self.scope=[]
 
@@ -40,7 +41,7 @@ class Sequence:
                     zws_dict={"xs":actual_point_list_x,
                             "ys": actual_point_list_y,
                             "zs": actual_point_list_z,
-                            "color": color[start_list_index:len(actual_point_list_x)]}
+                            "color": color[start_list_index:start_list_index+len(actual_point_list_x)]}
                     result_list.append(zws_dict)
                     actual_point_list_x=[]
                     actual_point_list_y=[]
@@ -52,16 +53,19 @@ class Sequence:
             zws_dict={"xs":actual_point_list_x,
                     "ys": actual_point_list_y,
                     "zs": actual_point_list_z,
-                    "color": color[start_list_index:len(actual_point_list_x)]}
+                    "color": color[start_list_index:start_list_index+len(actual_point_list_x)]}
             result_list.append(zws_dict)
         return result_list
 
     def get_plot_sequence_distance_data(self, chosen_sequence):#TODO:generate values before, more getting 
-        xvals : list[int] = list(set(self.scope).intersection(set(chosen_sequence.scope)))#TODO:scope nur einfaerben statt zoom? Verhalten eval.
+        xvals=[i for i in range(len(self.data_objects))]
         if chosen_sequence==self:
             yvals=[0]*len(xvals)
         else:
-            yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) for i in xvals]
+            yvals=[math.sqrt(get_squared_distance_between_sequences(self,chosen_sequence,i)) 
+                   if get_squared_distance_between_sequences(self,chosen_sequence,i)!=-1.0 
+                   else -1 
+                   for i in xvals]
         return xvals,yvals #TODO: last line ok but computation should not be here
 
     def add_point(self):
@@ -71,10 +75,10 @@ class Sequence:
         except StopIteration as stop:
             raise stop
 
-    def next_value(self,input_objects):
-        for i in range(len(input_objects)):
+    def next_value(self):
+        for i in range(len(self.input_objects)):
             try:
-                yield DataObject(input_objects[i])
+                yield DataObject(self.input_objects[i])
             except StopIteration as stop:
                 raise stop
 
@@ -88,37 +92,38 @@ class Sequence:
     def get_max_squared_dist_value(self,chosen_data_object):
         if self.distance_dict =={} or chosen_data_object not in self.distance_dict.keys():
             distance_dict_for_chosen={}
-            for i in range(len(self.plot_data)):#erganze demnach falls ref nicht plot data war
-                distance_dict_for_chosen[self.plot_data[i]]=square_distance_between(self.plot_data[i],chosen_data_object) 
+            for i in self.scope:#erganze demnach falls ref nicht plot data war
+                distance_dict_for_chosen[self.data_objects[i]]=square_distance_between(self.data_objects[i],chosen_data_object) 
                 #nur die aus dem dict
             self.distance_dict[chosen_data_object]=distance_dict_for_chosen
 
-        sq_dist_values=[]
-        for data_object in self.plot_data:
+        sq_dist_values={}
+        for index in self.scope:
+            data_object=self.data_objects[index]
             if data_object in self.distance_dict[chosen_data_object].keys():
-                sq_dist_values.append(self.distance_dict[chosen_data_object][data_object])
+                sq_dist_values[index]=self.distance_dict[chosen_data_object][data_object]
             else:
                 new_value=square_distance_between(data_object,chosen_data_object)
                 self.distance_dict[chosen_data_object][data_object]=new_value
-                sq_dist_values.append(new_value)
+                sq_dist_values[index]=new_value
 
-            
-       # sq_dist_values=[square_distance_between(self.plot_data[i],chosen_data_object) 
-       #                     for i in range(len(self.plot_data))]#nur die aus dem dict
-        max_sq_dist_value=max(sq_dist_values)
+        max_sq_dist_value=max(sq_dist_values.values())
 
-        self.delete_list=[index for index in range(len(self.plot_data)) if sq_dist_values[index]==max_sq_dist_value]
+        self.delete_list=[index for index in self.scope if sq_dist_values[index]==max_sq_dist_value]#if more than one 
         return max_sq_dist_value
     
     def set_plot_data_to_radius(self):
         vals=[]
         scope_vals=[]
-        for index in range(len(self.plot_data)):#should be length of scope as well, scope are the 'real indices of plot_data' 
-            # TODO:testing
-            if index in self.delete_list:
-                continue
-            scope_vals.append(self.scope[index])
-            vals.append(self.plot_data[index])
+        for index in self.scope:
+            try:
+                if index in self.delete_list:
+                    continue
+                scope_vals.append(index)
+                vals.append(self.data_objects[index])
+            except IndexError as e:
+                print("Index error: index", index, len(self.data_objects), len(self.scope))
+
         self.scope=scope_vals
         self.plot_data=vals
     #TODO: bit evil
@@ -144,8 +149,10 @@ class Sequence:
 
 
 def get_squared_distance_between_sequences(self_sequence:Sequence,chosen_sequence:Sequence,i:int):
-    if i >=min([len(chosen_sequence.data_objects), len(self_sequence.data_objects)]) or i <0:
+    if i >=max([len(chosen_sequence.data_objects), len(self_sequence.data_objects)]) or i <0:
         raise Exception(f"{i} is not in valid range")
+    if i>=min(len(chosen_sequence.data_objects), len(self_sequence.data_objects)):
+        return -1.0
     if self_sequence.distance_dict=={} and chosen_sequence.distance_dict=={}:
         chosen_sequence.compute_squared_distance_to(self_sequence)
         return chosen_sequence.distance_dict[self_sequence.data_objects[i]][chosen_sequence.data_objects[i]]

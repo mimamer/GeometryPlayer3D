@@ -13,6 +13,7 @@
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sequencemanager" href="sequencemanager.html" />
     <link rel="prev" title="Welcome to GeometryPlayer3D’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -32,27 +33,70 @@
             
   <section id="geometryplayer3d">
 <h1>GeometryPlayer3D<a class="headerlink" href="#geometryplayer3d" title="Link to this heading">¶</a></h1>
-<p><cite>GeometryPlayer3D</cite> class has several functions:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="GeometryPlayer3D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeometryPlayer3D</span></span><a class="headerlink" href="#GeometryPlayer3D" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The <cite>GeometryPlayer3D</cite> class builds the root window and delegates the processing of events.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="GeometryPlayer3D.__init__">
-<span class="sig-prename descclassname"><span class="pre">GeometryPlayer3D.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GeometryPlayer3D.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>exampletext:Return a list of random ingredients as strings.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>kind</strong> (<em>list</em><em>[</em><em>str</em><em>] or </em><em>None</em>) – Optional “kind” of ingredients.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The ingredients list.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[str]</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="GeometryPlayer3d.__init__">
+<span class="sig-prename descclassname"><span class="pre">GeometryPlayer3d.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GeometryPlayer3d.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Builds the GUI with binded mouseevents, buttons and
+empty plots. Return value is None.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="GeometryPlayer3D.adjust_dats_points_for_zoom">
-<span class="sig-prename descclassname"><span class="pre">GeometryPlayer3D.</span></span><span class="sig-name descname"><span class="pre">adjust_dats_points_for_zoom</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GeometryPlayer3D.adjust_dats_points_for_zoom" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="update_plot">
+<span class="sig-name descname"><span class="pre">update_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#update_plot" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the 3d Plot and the distance plot.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="run_figure">
+<span class="sig-name descname"><span class="pre">run_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#run_figure" title="Link to this definition">¶</a></dt>
+<dd><p>Goes one step forward in the animation of the sequences if the switch is on.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="press_switch">
+<span class="sig-name descname"><span class="pre">press_switch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#press_switch" title="Link to this definition">¶</a></dt>
+<dd><p>Switch between <em>play</em> and <em>pause</em>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="trigger_button_menu_events">
+<span class="sig-name descname"><span class="pre">trigger_button_menu_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#trigger_button_menu_events" title="Link to this definition">¶</a></dt>
+<dd><p>Triggers the command that matches the parameter <strong>value</strong>.
+The command has to be bounded to a button under “Reset View”.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="trigger_button_events">
+<span class="sig-name descname"><span class="pre">trigger_button_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#trigger_button_events" title="Link to this definition">¶</a></dt>
+<dd><p>Triggers the command that matches the parameter <strong>event</strong>.
+The command has to be bounded to the ⏮ , ⏴ , ⏯ , ⏵ , ⏭ , + or - button.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="trigger_scroll_events">
+<span class="sig-name descname"><span class="pre">trigger_scroll_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">matplotlib.backend_bases.MouseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#trigger_scroll_events" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line">Triggers the command that matches the field <em>button</em> of parameter <strong>event</strong>.</div>
+<div class="line">The command has to be bounded to the mouse scroll event ‘up’ or ‘down’ .</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="trigger_press_events">
+<span class="sig-name descname"><span class="pre">trigger_press_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">matplotlib.backend_bases.MouseEvent</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#trigger_press_events" title="Link to this definition">¶</a></dt>
+<dd><p>Triggers the command that matches the field <em>button</em> of the parameter <strong>event</strong>.
+The command has to be bounded to the mouse press event ‘LEFT’ or ‘RIGHT’ .</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main_loop">
+<span class="sig-name descname"><span class="pre">main_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#main_loop" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -76,10 +120,28 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GeometryPlayer3D</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#GeometryPlayer3D.__init__"><code class="docutils literal notranslate"><span class="pre">GeometryPlayer3D.__init__()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#GeometryPlayer3D.adjust_dats_points_for_zoom"><code class="docutils literal notranslate"><span class="pre">GeometryPlayer3D.adjust_dats_points_for_zoom()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#GeometryPlayer3D"><code class="docutils literal notranslate"><span class="pre">GeometryPlayer3D</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#GeometryPlayer3d.__init__"><code class="docutils literal notranslate"><span class="pre">GeometryPlayer3d.__init__()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#update_plot"><code class="docutils literal notranslate"><span class="pre">update_plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run_figure"><code class="docutils literal notranslate"><span class="pre">run_figure()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#press_switch"><code class="docutils literal notranslate"><span class="pre">press_switch()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigger_button_menu_events"><code class="docutils literal notranslate"><span class="pre">trigger_button_menu_events()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigger_button_events"><code class="docutils literal notranslate"><span class="pre">trigger_button_events()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigger_scroll_events"><code class="docutils literal notranslate"><span class="pre">trigger_scroll_events()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigger_press_events"><code class="docutils literal notranslate"><span class="pre">trigger_press_events()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main_loop"><code class="docutils literal notranslate"><span class="pre">main_loop()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="sequencemanager.html">sequencemanager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sequence.html">sequence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataobject.html">dataobject</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataobject.html#id1">DataObject</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plot3d.html">plot3d</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotdistance.html">plotdistance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="buttonevent.html">buttonevent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eventbinder.html">eventbinder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">main</a></li>
 </ul>
 
 <div class="relations">
@@ -87,6 +149,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to GeometryPlayer3D’s documentation!</a></li>
+      <li>Next: <a href="sequencemanager.html" title="next chapter">sequencemanager</a></li>
   </ul></li>
 </ul>
 </div>

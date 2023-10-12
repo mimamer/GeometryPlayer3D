@@ -18,7 +18,15 @@ Welcome to GeometryPlayer3D's documentation!
 .. toctree::
 
    geometryplayer3d
-
+   sequencemanager
+   sequence
+   dataobject
+   plot3d
+   plotdistance
+   buttonevent
+   eventbinder
+   utils
+   main
 
 
 Indices and tables

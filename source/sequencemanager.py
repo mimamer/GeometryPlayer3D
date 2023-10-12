@@ -3,6 +3,7 @@ from matplotlib.lines import Line2D
 import math
 from source.dataobject import square_distance_between
 from source.utils import create_colors
+from matplotlib.backend_bases import MouseButton
 class SequenceManager:
     def __init__(self,input_sequences : list[Sequence] = None):
         self.tmp_index=0
@@ -14,7 +15,7 @@ class SequenceManager:
         else:
             self.sequences=input_sequences
 
-        self.length_plot_window=self.sequences[2].total_length#TODO:only temporary
+        self.length_plot_window=1000#TODO:only temporary
         self.colors=create_colors(self.length_plot_window)
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
@@ -23,6 +24,9 @@ class SequenceManager:
         self.chosen_data_object=None#self.chosen_sequence.data_objects[2]
         self.hover_sequence=self.sequences[0]
         self.hover_data_object=None#self.chosen_sequence.data_objects[2]
+
+    def add_sequence():#TODO. also color of sequence should be known by sequence.
+        return
 
     def is_empty_plot(self) -> bool:
         for curve in self.sequences:
@@ -66,7 +70,7 @@ class SequenceManager:
             else:
                 sq_dist_values.append(-1)#default, since -1 is an impossible value
         max_value=max(sq_dist_values)
-        if self.hover_data_object is not None:#TODO:hover data object is reset to none, may not pretty
+        if self.hover_data_object is not None and self.hover_index not in self.hover_sequence.scope:
             self.hover_data_object=None
             self.hover_index=None
             self.hover_sequence=None
@@ -92,8 +96,6 @@ class SequenceManager:
                 self.addable_points-=self.add_point()
             self.set_plot_data_regarding_tmp_index()
 
-            
-            
     def add_point(self):  
         if self.addable_points>0:   
             stop_iteration_counter=0
@@ -109,22 +111,21 @@ class SequenceManager:
             return stop_iteration_counter
         return 0
 
-
-
     def set_plot_data_regarding_tmp_index(self):
         for curve in self.sequences:
             curve.reset_to_actual_points(self.tmp_index)
 
-    def choose_sequence(self,event):
+    def choose_sequence(self,event):#TODO:IS VERY BUGGY
         index_chosen=int(round(event.xdata,0))
         if max(event.xdata,index_chosen)-min(event.xdata,index_chosen)>=0.5:
             return None,None
         min_dist=None
         chosen_sequence=None
 
-        for index in range(len(self.dist_lines)):#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
-            xvals,yvals=self.dist_lines[index][0],self.dist_lines[index][1]
-            print(xvals,yvals)
+        self.compute_dist_lines()#update before usage, this call is not enough
+
+        for line in self.dist_lines:#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
+            xvals,yvals=self.dist_lines[line]["xs"],self.dist_lines[line]["ys"]
             if len(yvals)==0:#TODO:could be a probem if only one is left
                 print("yvals are not right (xvals,yvals)", xvals,yvals)
                 continue
@@ -144,23 +145,28 @@ class SequenceManager:
             
             if min_dist is None or min_dist>current_abs:
                 min_dist=current_abs
-                chosen_sequence=index
+                chosen_sequence=line
                 y_index_star=y_index
 
         if min_dist is None or min_dist>=0.5:
-            return None,None, None
-        return chosen_sequence, y_index_star
+            return None,None
+
+        if event.button==MouseButton.LEFT:
+            #TODO: reset zoom here! 
+            self.set_chosen_object(chosen_sequence, y_index_star)
+        else:
+            self.set_hover_object(chosen_sequence,y_index_star)
     
     def set_chosen_object(self,chosen_sequence, index_chosen):
         if chosen_sequence is not None and index_chosen is not None:
-            self.chosen_sequence=self.sequences[chosen_sequence]
-            self.chosen_data_object=self.chosen_sequence.data_objects[index_chosen]#one can choose a not visible object...
+            self.chosen_sequence=chosen_sequence
+            self.chosen_data_object=self.chosen_sequence.data_objects[index_chosen]
             self.chosen_index=index_chosen
 
     def set_hover_object(self,hover_seq,index):
-        if hover_seq is not None:
+        if hover_seq is not None and index in hover_seq.scope:
             self.hover_sequence=hover_seq
-            self.hover_data_object=self.sequences[hover_seq].data_objects[index]#one can choose a not visible object...
+            self.hover_data_object=self.hover_sequence.data_objects[index]
             self.hover_index=index
 
             
@@ -180,12 +186,32 @@ class SequenceManager:
     def compute_dist_lines(self):
         if self.is_empty_plot():
             return
-        self.dist_lines =list()
+        self.dist_lines =dict()
         for index in range(len(self.sequences)):
-                sequence=self.sequences[index]
-                #TODO:next function is ugly
-                xvals,yvals=sequence.get_plot_sequence_distance_data(self.chosen_sequence)
-                self.dist_lines.append([xvals,yvals,self.colors[index][int(len(self.colors[index])/2)]])#TODO:color...#
+            sequence=self.sequences[index]
+            #TODO:next function is ugly
+            xvals,yvals=sequence.get_plot_sequence_distance_data(self.chosen_sequence)
+            self.dist_lines[sequence]={
+                "xs":xvals,
+                "ys":yvals,
+                "color":self.colors[index][int(len(self.colors[index])/2)]
+                }#TODO:color...#
+   
+    def get_scope_data(self):
+        result={}
+        for sequence in self.sequences:
+            try:
+                xvals=[self.dist_lines[sequence]["xs"][scope_index] for scope_index in sequence.scope]
+                yvals=[self.dist_lines[sequence]["ys"][scope_index] for scope_index in sequence.scope]
+                sequence_result={"xs":xvals,
+                             "ys":yvals,
+                             }
+                result[sequence]=sequence_result
+            except IndexError as e:
+                #chosen sequence has ended
+                print(e)
+
+        return result
 
 
     def get_plot_distance_data(self):
@@ -201,12 +227,15 @@ class SequenceManager:
 
     def get_hover_data_object_3d(self):
           if self.hover_data_object is not None:
-            return self.hover_data_object.get_plot_data_object('aqua')#TODO return make it a getter?
+            return self.hover_data_object.get_plot_data_object('aqua')
 
     def get_hover_data_object_distance(self):
         if self.hover_data_object is not None:
-            return self.hover_index, \
-                math.sqrt(square_distance_between(self.chosen_sequence.plot_data[self.hover_index],self.hover_data_object))
+            if self.hover_index < self.chosen_sequence.total_length:
+                return self.hover_index, \
+                    math.sqrt(square_distance_between(self.chosen_sequence.data_objects[self.hover_index],self.hover_data_object))
+            else:
+                return None, None
         return None,None
 
     def jump_to_start(self):

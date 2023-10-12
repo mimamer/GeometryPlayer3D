@@ -3,9 +3,12 @@ from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import numpy
 
 is_visible_factor=0.01
+data_object_counter=0
 
 class DataObject:
     def __init__(self,data):
+        global data_object_counter
+        data_object_counter+=1
         self.is_vertex=True
         self.width_x=0
         self.height_y=0
@@ -40,7 +43,7 @@ class DataObject:
         return self.max_lims[0]-self.min_lims[0],self.max_lims[1]-self.min_lims[1],self.max_lims[2]-self.min_lims[2]
 
 
-    def get_plot_data_object(self,color):
+    def get_plot_data_object(self,color) -> dict:
         if self.is_vertex:
             return {"xs":self.data[0],
                     "ys": self.data[1],

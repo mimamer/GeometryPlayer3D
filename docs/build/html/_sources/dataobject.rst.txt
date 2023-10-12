@@ -1,0 +1,38 @@
+dataobject
+----------
+.. py:module::dataobject
+
+Contains the class `DataObject` and static methods with DataObjects as parameters
+and possible auxiliary functions.
+
+DataObject
+----------------
+
+.. py:class:: DataObject
+    
+    The `DataObject` class contains the data of the objects, that are plotted.
+
+.. py:property:: is_vertex
+    :type: bool
+
+
+.. py:function:: DataObject.__init__(self)
+
+   Builds the GUI with event binding and
+   empty plots. Return value is None.
+
+   :param self: non-static method
+   :param data: data is a list of object data.
+        Object data is ether a one-element list with a
+        list of floats (modelling a 3D point)
+        or a list of segment lists, each containing
+        two lists with floats (modelling a line in 3D space).
+   :type data: list[list[list[float]]]
+   :type self: DataObject
+   :return: New DataObject, which contains
+    the information of the input data and resulting properties.
+   :rtype: DataObject
+
+.. py:function:: get_plot_data_object(self,color) -> dict
+
+.. py:staticmethod:: square_distance_between[DataObject,DataObject](object_a,object_b)

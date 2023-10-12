@@ -28,7 +28,7 @@ class Plot3D:
             if "line_collection" in chosen_dict.keys():
                 self.plot.add_collection3d(chosen_dict["line_collection"])#TODO:if line collection to small other kind of plotting
             else:
-                self.plot.scatter(chosen_dict["xs"],chosen_dict["ys"],chosen_dict["zs"],s=7, depthshade=False,
+                self.plot.scatter(chosen_dict["xs"],chosen_dict["ys"],chosen_dict["zs"],s=25, depthshade=False,
                                    marker="o", c='fuchsia')
         
         hover_dict=sequence_manager.get_hover_data_object_3d()
@@ -37,7 +37,7 @@ class Plot3D:
                 self.plot.add_collection3d(hover_dict["line_collection"])#TODO:if line collection to small other kind of plotting
             else:
                 self.plot.scatter(hover_dict["xs"],hover_dict["ys"],hover_dict["zs"],
-                            depthshade=False,s=7,marker="o", c='aqua')
+                            depthshade=False,s=25,marker="o", c='aqua')
         self.set_default_plot_labels()
         self.canvas.draw_idle()
         self.canvas.flush_events()

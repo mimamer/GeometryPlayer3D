@@ -15,13 +15,19 @@ def open_dataobjects():
     return data_objects
 
 def open_dataobjects_2():
-    path="/home/michelle/real/3d_player/test_data/modified_meth1.txt"
+    path="/home/michelle/real/3d_player/test_data/modified_meth1.json"
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
 
 def open_dataobjects_testformat():
     path="/home/michelle/real/3d_player/test_data/formattest.txt"
+    data_objects=read_data(path)
+    data_objects=data_objects['data']
+    return data_objects
+
+def open_dataobjects_test_data():
+    path="/home/michelle/real/3d_player/test_data/test_data.json"
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
