@@ -44,11 +44,11 @@ def open_dataobjects_test_data():
 
 def create_colors(length_plot_window):
     colors=[]
-    for cmap in ['Greys','Greens','Purples','Oranges', 'Blues']:#TODO:limits number of curves that can be visualized, cycle, use mod operator
+    for cmap in ['Greys','Greens','Purples','Oranges', 'Blues']:
         cmap=plt.get_cmap(cmap)
         colo=[]
         cmap_usable=int(cmap.N/3)
-        col_abs=(cmap.N-cmap_usable)/length_plot_window # hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
+        col_abs=(cmap.N-cmap_usable)/length_plot_window #TODO: hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
         i=0
         while i*col_abs<=cmap.N-cmap_usable:
             rgba=cmap(cmap_usable+int(i*col_abs))

@@ -21,22 +21,24 @@ class SequenceManager:
         self.colors=create_colors(self.length_plot_window)
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
-        #TODO:refactor this stuff
+        #TODO:refactor this stuff, can I do better?
         self.chosen_sequence=None
-        self.chosen_data_object=None#self.chosen_sequence.data_objects[2]
+        self.chosen_data_object=None
         self.hover_sequence=None
-        self.hover_data_object=None#self.chosen_sequence.data_objects[2]
+        self.hover_data_object=None
 
-    def add_sequence(self,data_objects,fname):#TODO. also color of sequence should be known by sequence.
+    def add_sequence(self,data_objects,fname):
         sequence_name=os.path.basename(fname)
         new_sequence=Sequence(data_objects,sequence_name,self.colors[len(self.sequences)])
         if len(self.sequences)==0:
             self.chosen_sequence=new_sequence
             self.hover_sequence=new_sequence
         self.sequences.append(new_sequence)
-        self.addable_points+=1#TODO: what when a sequence is not loaded with the others
+        self.addable_points+=1
         self.catch_up(new_sequence, len(self.sequences)-1)
         self.set_plot_data_regarding_tmp_index()
+        if len(self.sequences)==1:
+            self.forwards()
         return
     
     def get_sequence_names(self):
@@ -74,18 +76,21 @@ class SequenceManager:
             self.zoom_in()
         self.zoom_factor=tmp_zoom_factor
 
+    def zoom_reset(self):
+        if self.zoom_factor==0 or self.is_empty_plot() or self.chosen_data_object is None:
+            return
+        self.set_plot_data_regarding_tmp_index()
+
     
     def zoom_in(self):
         if self.is_empty_plot() or self.chosen_data_object is None:
             return
-
         # radial zoom (because it's instinctive),
         # although it is possible to not show a border data point even if it would be in the cubic view
         empty=0
         for sequence in self.sequences:
             if sequence.is_empty():
                 empty+=1
-
         if empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1:
             return
 
@@ -105,7 +110,7 @@ class SequenceManager:
 
         for index in range(len(self.sequences)):
             if not self.sequences[index].is_empty() and sq_dist_values[index]!=-1 and max_value==sq_dist_values[index]:
-                self.sequences[index].set_plot_data_to_radius()#TODO:rename?
+                self.sequences[index].apply_sequence_delete_list()
         self.zoom_factor+=1
 
 
@@ -143,7 +148,7 @@ class SequenceManager:
         for sequence in self.sequences:
             sequence.reset_to_actual_points(self.tmp_index)
 
-    def choose_sequence(self,event):#TODO:IS VERY BUGGY
+    def choose_sequence(self,event):#TODO:testing
         index_chosen=int(round(event.xdata,0))
         if max(event.xdata,index_chosen)-min(event.xdata,index_chosen)>=0.5:
             return None,None
@@ -152,9 +157,9 @@ class SequenceManager:
 
         self.compute_dist_lines()#update before usage
 
-        for line in self.dist_lines:#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
+        for line in self.dist_lines:
             xvals,yvals=self.dist_lines[line]["xs"],self.dist_lines[line]["ys"]
-            if len(yvals)==0:#TODO:could be a probem if only one is left
+            if len(yvals)==0:
                 print("yvals are not right (xvals,yvals)", xvals,yvals)
                 continue
             else:
@@ -180,7 +185,7 @@ class SequenceManager:
             return None,None
 
         if event.button==MouseButton.LEFT:
-            #TODO: reset zoom here! 
+            self.zoom_reset()
             self.set_chosen_object(chosen_sequence, y_index_star)
         else:
             self.set_hover_object(chosen_sequence,y_index_star)
@@ -196,35 +201,35 @@ class SequenceManager:
             self.hover_sequence=hover_seq
             self.hover_data_object=self.hover_sequence.data_objects[index]
             self.hover_index=index
-
-            
+     
     def get_plot_data_3d(self):
         if self.is_empty_plot():
             return
         result=[]
         for index in range(len(self.sequences)):
-                sequence=self.sequences[index]
-                if sequence==self.chosen_sequence:
+            sequence=self.sequences[index]
+            if sequence==self.chosen_sequence:
+                if sequence==self.hover_sequence:
+                    result.append(sequence.plot_sequence_data(self.colors[index], [self.hover_data_object,self.chosen_data_object]))
+                else:
                     result.append(sequence.plot_sequence_data(self.colors[index], self.chosen_data_object))
-                elif sequence==self.hover_sequence:
-                    result.append(sequence.plot_sequence_data(self.colors[index], self.hover_data_object))
+            elif sequence==self.hover_sequence:
+                result.append(sequence.plot_sequence_data(self.colors[index], self.hover_data_object))
         return result
 
-    
     def compute_dist_lines(self):
         if self.is_empty_plot():
             return
         self.dist_lines =dict()
         for index in range(len(self.sequences)):
             sequence=self.sequences[index]
-            #TODO:next function is ugly
             xvals,yvals=sequence.get_plot_sequence_distance_data(self.chosen_sequence)
             if xvals is not None and yvals is not None:
                 self.dist_lines[sequence]={
                     "xs":xvals,
                     "ys":yvals,
-                    "color":self.colors[index][int(len(self.colors[index])/2)]
-                    }#TODO:color...#
+                    "color":sequence.representative_color
+                    }
    
     def get_scope_data(self):
         if self.dist_lines is None or len(self.dist_lines)==0:

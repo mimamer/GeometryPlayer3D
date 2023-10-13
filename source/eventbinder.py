@@ -42,6 +42,7 @@ class EventBinder:
             ButtonEvent("\u23F5",sequence_manager.forwards),
             ButtonEvent("\u23ED", sequence_manager.jump_to_end),
             ButtonEvent("+",sequence_manager.zoom_in),
+            ButtonEvent("0",sequence_manager.zoom_reset),
             ButtonEvent("-",sequence_manager.zoom_out)
             ]       
         button_list=[]

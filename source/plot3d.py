@@ -25,25 +25,21 @@ class Plot3D:
             plot_data_3d=sequence_manager.get_plot_data_3d()
             self.handle_plot_data(plot_data_3d)
             chosen_dict=sequence_manager.get_chosen_data_object_3d()
-            if chosen_dict is not None: 
-                if "line_collection" in chosen_dict.keys():
-                    self.plot.add_collection3d(chosen_dict["line_collection"])#TODO:if line collection to small other kind of plotting
-                else:
-                    self.plot.scatter(chosen_dict["xs"],chosen_dict["ys"],chosen_dict["zs"],s=25, depthshade=False,
-                                    marker="o", c='fuchsia')
-            
+            self.handle_single_object(chosen_dict,'fuchsia')
             hover_dict=sequence_manager.get_hover_data_object_3d()
-            if hover_dict is not None:#TODO:function with color argument line 27-33 and 34-40 are almost the same
-                if "line_collection" in hover_dict.keys():
-                    self.plot.add_collection3d(hover_dict["line_collection"])#TODO:if line collection to small other kind of plotting
-                else:
-                    self.plot.scatter(hover_dict["xs"],hover_dict["ys"],hover_dict["zs"],
-                                depthshade=False,s=25,marker="o", c='aqua')
+            self.handle_single_object(hover_dict,'aqua')
         #TODO: before set_default_plot_labels do the ax lim stuff!
         self.set_default_plot_labels(sequence_manager.get_sequence_names(),sequence_manager.get_sequence_representative_colors())
         self.canvas.draw_idle()
         self.canvas.flush_events()
 
+    def handle_single_object(self,object_dictionary,color:str):
+            if object_dictionary is not None: 
+                if "line_collection" in object_dictionary.keys():
+                    self.plot.add_collection3d(object_dictionary["line_collection"])#TODO:if line collection to small other kind of plotting
+                else:
+                    self.plot.scatter(object_dictionary["xs"],object_dictionary["ys"],object_dictionary["zs"],s=25, depthshade=False,
+                                    marker="o", c=color)
     def standard_view(self):
         self.plot.azim=-60
         self.plot.elev=30

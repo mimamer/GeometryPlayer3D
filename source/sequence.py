@@ -31,8 +31,10 @@ class Sequence:
         start_list_index=0
         index=0
         result_list=[]
+        if type(jump_over_object)!=list:
+            jump_over_object=[jump_over_object]
         while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming (mehr als eine Zusammenhangskomponente)
-            if jump_over_object==self.plot_data[index]:
+            if self.plot_data[index] in jump_over_object:
                 index+=1
                 continue
             if self.plot_data[index].is_vertex:
@@ -117,7 +119,7 @@ class Sequence:
         self.delete_list=[index for index in self.scope if sq_dist_values[index]==max_sq_dist_value]#if more than one 
         return max_sq_dist_value
     
-    def set_plot_data_to_radius(self):
+    def apply_sequence_delete_list(self):
         vals=[]
         scope_vals=[]
         for index in self.scope:
@@ -131,7 +133,7 @@ class Sequence:
 
         self.scope=scope_vals
         self.plot_data=vals
-    #TODO: bit evil
+
     def compute_squared_distance_to(self,sequence):
         min_sequence_length=min([len(self.data_objects),len(sequence.data_objects)])
         for i in range(min_sequence_length):
