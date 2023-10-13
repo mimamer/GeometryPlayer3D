@@ -4,6 +4,8 @@ import math
 from source.dataobject import square_distance_between
 from source.utils import create_colors
 from matplotlib.backend_bases import MouseButton
+import os.path
+
 class SequenceManager:
     def __init__(self,input_sequences : list[Sequence] = None):
         self.tmp_index=0
@@ -20,17 +22,43 @@ class SequenceManager:
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
         #TODO:refactor this stuff
-        self.chosen_sequence=self.sequences[0]
+        self.chosen_sequence=None
         self.chosen_data_object=None#self.chosen_sequence.data_objects[2]
-        self.hover_sequence=self.sequences[0]
+        self.hover_sequence=None
         self.hover_data_object=None#self.chosen_sequence.data_objects[2]
 
-    def add_sequence():#TODO. also color of sequence should be known by sequence.
+    def add_sequence(self,data_objects,fname):#TODO. also color of sequence should be known by sequence.
+        sequence_name=os.path.basename(fname)
+        new_sequence=Sequence(data_objects,sequence_name,self.colors[len(self.sequences)])
+        if len(self.sequences)==0:
+            self.chosen_sequence=new_sequence
+            self.hover_sequence=new_sequence
+        self.sequences.append(new_sequence)
+        self.addable_points+=1#TODO: what when a sequence is not loaded with the others
+        self.catch_up(new_sequence, len(self.sequences)-1)
+        self.set_plot_data_regarding_tmp_index()
         return
+    
+    def get_sequence_names(self):
+        names=[sequence.name for sequence in self.sequences]
+        return names
+        
+    def get_sequence_representative_colors(self):
+        colors=[sequence.representative_color for sequence in self.sequences]
+        return colors
+
+    def catch_up(self,sequence, seq_index):
+        for index in range(self.total_index):
+            try:
+                sequence.add_point()
+            except StopIteration:
+                self.finished_sequences.append(seq_index)
+                self.addable_points-=1
+                break
 
     def is_empty_plot(self) -> bool:
-        for curve in self.sequences:
-            if not curve.is_empty():
+        for sequence in self.sequences:
+            if not sequence.is_empty():
                 return False
         return True
         
@@ -112,8 +140,8 @@ class SequenceManager:
         return 0
 
     def set_plot_data_regarding_tmp_index(self):
-        for curve in self.sequences:
-            curve.reset_to_actual_points(self.tmp_index)
+        for sequence in self.sequences:
+            sequence.reset_to_actual_points(self.tmp_index)
 
     def choose_sequence(self,event):#TODO:IS VERY BUGGY
         index_chosen=int(round(event.xdata,0))
@@ -122,7 +150,7 @@ class SequenceManager:
         min_dist=None
         chosen_sequence=None
 
-        self.compute_dist_lines()#update before usage, this call is not enough
+        self.compute_dist_lines()#update before usage
 
         for line in self.dist_lines:#TODO: yvals are a real problem here, often out of range  (cuboid chosen, etc.)
             xvals,yvals=self.dist_lines[line]["xs"],self.dist_lines[line]["ys"]
@@ -191,13 +219,16 @@ class SequenceManager:
             sequence=self.sequences[index]
             #TODO:next function is ugly
             xvals,yvals=sequence.get_plot_sequence_distance_data(self.chosen_sequence)
-            self.dist_lines[sequence]={
-                "xs":xvals,
-                "ys":yvals,
-                "color":self.colors[index][int(len(self.colors[index])/2)]
-                }#TODO:color...#
+            if xvals is not None and yvals is not None:
+                self.dist_lines[sequence]={
+                    "xs":xvals,
+                    "ys":yvals,
+                    "color":self.colors[index][int(len(self.colors[index])/2)]
+                    }#TODO:color...#
    
     def get_scope_data(self):
+        if self.dist_lines is None or len(self.dist_lines)==0:
+            return None
         result={}
         for sequence in self.sequences:
             try:
@@ -239,6 +270,8 @@ class SequenceManager:
         return None,None
 
     def jump_to_start(self):
+        self.tmp_index=0
+        self.set_plot_data_regarding_tmp_index()
         return
 
     def jump_to_end(self):

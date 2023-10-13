@@ -3,7 +3,7 @@ from source.dataobject import DataObject
 import math
 
 class Sequence:
-    def __init__(self, input_objects):
+    def __init__(self, input_objects, name, color):
         self.plot_data=None
         self.data_objects=[]
         self.input_objects=input_objects
@@ -11,6 +11,9 @@ class Sequence:
         self.total_length=len(self.input_objects)
         self.distance_dict={}
         self.scope=[]
+        self.name=name
+        self.color=color
+        self.representative_color=self.color[int(len(self.color)/2)]
 
     def reset_to_actual_points(self,tmp_index):
         if tmp_index>=len(self.data_objects):
@@ -59,6 +62,8 @@ class Sequence:
 
     def get_plot_sequence_distance_data(self, chosen_sequence):#TODO:generate values before, more getting 
         xvals=[i for i in range(len(self.data_objects))]
+        if chosen_sequence is None:
+            return None, None
         if chosen_sequence==self:
             yvals=[0]*len(xvals)
         else:
@@ -149,6 +154,8 @@ class Sequence:
 
 
 def get_squared_distance_between_sequences(self_sequence:Sequence,chosen_sequence:Sequence,i:int):
+    if self_sequence is None or chosen_sequence is None:
+        raise Exception("At least one of the sequences is empty")
     if i >=max([len(chosen_sequence.data_objects), len(self_sequence.data_objects)]) or i <0:
         raise Exception(f"{i} is not in valid range")
     if i>=min(len(chosen_sequence.data_objects), len(self_sequence.data_objects)):

@@ -5,15 +5,16 @@ import PySimpleGUI
 
 class EventBinder:
     def __init__(self,plot_3d,sequence_manager):#TODO:separate, init without register, register extra
-        button_menu_reset,menu_events=self.register_button_menu_events(plot_3d)
-        button_list,action_events=self.register_button_events(sequence_manager)
-        self.button_list_bottom=[button_menu_reset]+button_list
-        self.events=action_events+menu_events
+        view_menu,view_menu_events=self.register_view_menu_events(plot_3d)
+        button_list,button_events=self.register_button_events(sequence_manager)
+        self.button_list_bottom=[view_menu]+button_list
+        self.events=button_events+view_menu_events
 
     def get_button_list_bottom(self):
         return self.button_list_bottom
     
-    def register_button_menu_events(self,plot_3d:Plot3D) -> None:
+    
+    def register_view_menu_events(self,plot_3d:Plot3D) -> None:
         button_menu_events=[
             ButtonEvent("standard view",plot_3d.standard_view),
             ButtonEvent("front view",plot_3d.front_view),

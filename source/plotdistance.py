@@ -18,21 +18,22 @@ class PlotDistance():
 
     def update(self, sequence_manager:SequenceManager):
         self.plot.cla() #clear ax
-        sequence_manager.compute_dist_lines()
-        scope_data=sequence_manager.get_scope_data()
-        self.handle_scope_data(scope_data)
+        if not sequence_manager.is_empty_plot():
+            sequence_manager.compute_dist_lines()
+            scope_data=sequence_manager.get_scope_data()
+            self.handle_scope_data(scope_data)
 
-        plot_data_dist=sequence_manager.get_plot_distance_data()
-        self.handle_plot_data(plot_data_dist)
-        chosen_index=sequence_manager.get_chosen_data_object_distance()
-        if chosen_index is not None:       
-            self.plot.plot(chosen_index,0, marker="o", c='fuchsia')
-        
-        hover_index, hover_y=sequence_manager.get_hover_data_object_distance()#TODO:could be optimized
-        if hover_index is not None:
-            self.plot.plot(hover_index,
-                        hover_y,
-                        marker="o", c='aqua')
+            plot_data_dist=sequence_manager.get_plot_distance_data()
+            self.handle_plot_data(plot_data_dist)
+            chosen_index=sequence_manager.get_chosen_data_object_distance()
+            if chosen_index is not None:       
+                self.plot.plot(chosen_index,0, marker="o", c='fuchsia')
+            
+            hover_index, hover_y=sequence_manager.get_hover_data_object_distance()#TODO:could be optimized
+            if hover_index is not None:
+                self.plot.plot(hover_index,
+                            hover_y,
+                            marker="o", c='aqua')
         self.canvas.draw_idle()
         self.canvas.flush_events()
 

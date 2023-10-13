@@ -8,8 +8,7 @@ def read_data(path):
         return data
     
 #example set
-def open_dataobjects():
-    path="/home/michelle/real/3d_player/test_data/modified_meth0.txt"
+def open_dataobjects(path):
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
