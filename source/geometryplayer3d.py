@@ -16,6 +16,8 @@ class GeometryPlayer3D:
     def __init__(self):
         
         self.switch : bool = False
+        self.timeout=500
+        self.original_timeout=500
         self.plot_3d:Plot3D=Plot3D()
         self.plot_distance: PlotDistance=PlotDistance()
 
@@ -49,8 +51,13 @@ class GeometryPlayer3D:
     def press_switch(self) -> None:
         self.switch=not self.switch
 
-    def trigger_view_menu_events(self,value:str) -> None:
+    def trigger_view_menu_events(self,value) -> None:
         self.trigger_events(value)
+
+    def trigger_playback_menu_events(self,value)->None:
+        value=float(value)
+        self.timeout=self.original_timeout
+        self.timeout=self.timeout/float(value)
 
     def trigger_events(self, event:str) -> None:
         if event=="\u23EF":
@@ -93,11 +100,13 @@ class GeometryPlayer3D:
 
     def main_loop(self) -> None:
         while True:
-            event, values = self.root.read(timeout=500)
+            event, values = self.root.read(timeout=self.timeout)
             #if event!="__TIMEOUT__":
             #    print(event, values)
-            if values is not None and 0 in values.keys() and event==0:#button menu was triggered,TODO: could trigger playbackspeed here too? 
+            if values is not None and 0 in values.keys() and event==0:#button menu was triggered
                 self.trigger_view_menu_events(values[0])
+            if values is not None and 1 in values.keys() and event==1:#playback menu was triggered
+                self.trigger_playback_menu_events(values[1])
             if event == PySimpleGUI.WIN_CLOSED or event=="Exit":
                 break
             if event=="Open Sequence" and values["Open Sequence"] is not None:

@@ -7,8 +7,9 @@ class EventBinder:
     def __init__(self,plot_3d,sequence_manager):#TODO:separate, init without register, register extra
         view_menu,view_menu_events=self.register_view_menu_events(plot_3d)
         button_list,button_events=self.register_button_events(sequence_manager)
-        self.button_list_bottom=[view_menu]+button_list
-        self.events=button_events+view_menu_events
+        playback_menu,playback_events=self.register_playback_speed_events()
+        self.button_list_bottom=[view_menu]+button_list+[playback_menu]
+        self.events=button_events+view_menu_events+playback_events
 
     def get_button_list_bottom(self):
         return self.button_list_bottom
@@ -29,6 +30,19 @@ class EventBinder:
             names.append(event.event_name)
 
         return PySimpleGUI.ButtonMenu('Reset View',
+                    [names,
+                    names],
+                    border_width=2),button_menu_events#,background_color="gray"
+    
+    def register_playback_speed_events(self) -> None:
+        button_menu_events=[
+            ButtonEvent(str(step/100),self.dummy) for step in range(25,201,25)
+        ]
+        names=[]
+        for event in button_menu_events:
+            names.append(event.event_name)
+
+        return PySimpleGUI.ButtonMenu('Playback Speed',
                     [names,
                     names],
                     border_width=2),button_menu_events#,background_color="gray"

@@ -7,13 +7,13 @@ data_object_counter=0
 
 class DataObject:
     def __init__(self,data):
-        global data_object_counter
+        global data_object_counter#TODO:only for testing
         data_object_counter+=1
         self.is_vertex=True
         self.width_x=0
         self.height_y=0
         self.depth_z=0
-        factor=0.01 #is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
+        factor=0.01 #TODO: only for testing, is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
         if len(data)!=1:
             self.is_vertex=False
         self.data=None
@@ -30,7 +30,7 @@ class DataObject:
             except Exception as e:
                 print(e)
     
-    def get_dimensions(self):#TODO:naming?
+    def get_dimensions(self):#TODO:naming?etc
         self.min_lims=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         self.max_lims=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         for segment in self.data:
@@ -57,7 +57,7 @@ class DataObject:
                     "height_y": self.height_y,
                     "depth_z": self.depth_z}
 
-    def widening_ax_lims(self,ax):# only widening
+    def widening_ax_lims(self,ax):# only widening, TODO:delete
         if ax.get_xlim()[0] > self.min_lims[0]:
             ax.set_xlim((self.min_lims[0],ax.get_xlim()[1]))
         if ax.get_xlim()[1] < self.max_lims[0]:

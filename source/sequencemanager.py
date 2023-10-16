@@ -82,7 +82,7 @@ class SequenceManager:
         self.set_plot_data_regarding_tmp_index()
 
     
-    def zoom_in(self):
+    def zoom_in(self):#TODO:shorter
         if self.is_empty_plot() or self.chosen_data_object is None:
             return
         # radial zoom (because it's instinctive),
@@ -148,7 +148,7 @@ class SequenceManager:
         for sequence in self.sequences:
             sequence.reset_to_actual_points(self.tmp_index)
 
-    def choose_sequence(self,event):#TODO:testing
+    def choose_sequence(self,event):#TODO:testing, shorter?
         index_chosen=int(round(event.xdata,0))
         if max(event.xdata,index_chosen)-min(event.xdata,index_chosen)>=0.5:
             return None,None
