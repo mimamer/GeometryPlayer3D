@@ -26,7 +26,7 @@ class Sequence:
             self.plot_data=self.data_objects[tmp_index-window_length:tmp_index]
             self.scope=[i for i in range(tmp_index-window_length,tmp_index)]
 
-    def plot_sequence_data(self,color, jump_over_object=None):#TODO:shorter?
+    def plot_sequence_data(self, jump_over_object=None):#TODO:shorter?
         #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
         actual_point_list_x=[]
         actual_point_list_y=[]
@@ -49,19 +49,19 @@ class Sequence:
                     zws_dict={"xs":actual_point_list_x,
                             "ys": actual_point_list_y,
                             "zs": actual_point_list_z,
-                            "color": color[start_list_index:start_list_index+len(actual_point_list_x)]}
+                            "color": self.color[start_list_index:start_list_index+len(actual_point_list_x)]}
                     result_list.append(zws_dict)
                     actual_point_list_x=[]
                     actual_point_list_y=[]
                     actual_point_list_z=[]
                 start_list_index=index+1
-                result_list.append(self.plot_data[index].get_plot_data_object(color[index]))
+                result_list.append(self.plot_data[index].get_plot_data_object(self.color[index]))
             index+=1
         if len(actual_point_list_x)>0:
             zws_dict={"xs":actual_point_list_x,
                     "ys": actual_point_list_y,
                     "zs": actual_point_list_z,
-                    "color": color[start_list_index:start_list_index+len(actual_point_list_x)]}
+                    "color": self.color[start_list_index:start_list_index+len(actual_point_list_x)]}
             result_list.append(zws_dict)
         return result_list
 

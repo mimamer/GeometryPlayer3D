@@ -20,7 +20,7 @@ class SequenceManager:
             self.sequences=input_sequences
 
         self.length_plot_window=10#TODO:only temporary
-        self.colors=create_colors(1000)
+        self.colors=create_colors(1000)#TODO:for every sequence, own length? generator?
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
         #TODO:refactor this stuff, can I do better?
@@ -31,7 +31,7 @@ class SequenceManager:
 
     def add_sequence(self,data_objects,fname):
         sequence_name=os.path.basename(fname)
-        new_sequence=Sequence(data_objects,sequence_name,self.colors[len(self.sequences)])
+        new_sequence=Sequence(data_objects,sequence_name,self.colors[len(self.sequences)])#TODO:here instead color generator next call
         if len(self.sequences)==0:
             self.chosen_sequence=new_sequence
             self.hover_sequence=new_sequence
@@ -44,11 +44,11 @@ class SequenceManager:
         return
     
     def get_sequence_names(self):
-        names=[sequence.name for sequence in self.sequences]
+        names=[sequence.name for sequence in self.sequences if not sequence.is_empty()]
         return names
         
     def get_sequence_representative_colors(self):
-        colors=[sequence.representative_color for sequence in self.sequences]
+        colors=[sequence.representative_color for sequence in self.sequences if not sequence.is_empty()]
         return colors
 
     def catch_up(self,sequence, seq_index):
@@ -215,13 +215,13 @@ class SequenceManager:
             sequence=self.sequences[index]
             if sequence==self.chosen_sequence:
                 if sequence==self.hover_sequence:
-                    result.append(sequence.plot_sequence_data(self.colors[index], [self.hover_data_object,self.chosen_data_object]))
+                    result.append(sequence.plot_sequence_data( [self.hover_data_object,self.chosen_data_object]))
                 else:
-                    result.append(sequence.plot_sequence_data(self.colors[index], self.chosen_data_object))
+                    result.append(sequence.plot_sequence_data( self.chosen_data_object))
             elif sequence==self.hover_sequence:
-                result.append(sequence.plot_sequence_data(self.colors[index], self.hover_data_object))
+                result.append(sequence.plot_sequence_data( self.hover_data_object))
             else:
-                result.append(sequence.plot_sequence_data(self.colors[index]))
+                result.append(sequence.plot_sequence_data())
         return result
 
     def compute_dist_lines(self):

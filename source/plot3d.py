@@ -75,8 +75,6 @@ class Plot3D:
         self.plot.set_zlabel("z")
         if legend_names is not None and legend_colors is not None:
             self.plot.legend(labels=legend_names, labelcolor=legend_colors)
-        #if legend_colors is not None:
-        #    self.plot.legend(labelcolor=legend_colors)
 
     def handle_plot_data(self, plot_data_3d,sequence_manager):
         sequence_manager.min_lim=None
