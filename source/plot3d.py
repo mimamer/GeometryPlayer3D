@@ -39,13 +39,14 @@ class Plot3D:
             if object_dictionary is not None: 
                 if "line_collection" in object_dictionary.keys():
                     self.plot.add_collection3d(object_dictionary["line_collection"])#TODO:if line collection to small other kind of plotting, TODO:_ sequence_manager stuff is evil here, correct_lims is a sequence_manager function!
-                    self.correct_lims([object_dictionary["min_lims"][0]],[object_dictionary["min_lims"][1]],[object_dictionary["min_lims"][2]],sequence_manager)
-                    self.correct_lims([object_dictionary["max_lims"][0]],[object_dictionary["max_lims"][1]],[object_dictionary["max_lims"][2]],sequence_manager)
+                    sequence_manager.correct_lims([object_dictionary["min_lims"][0]],[object_dictionary["min_lims"][1]],[object_dictionary["min_lims"][2]])
+                    sequence_manager.correct_lims([object_dictionary["max_lims"][0]],[object_dictionary["max_lims"][1]],[object_dictionary["max_lims"][2]])
                 
                 else:
                     self.plot.scatter(object_dictionary["xs"],object_dictionary["ys"],object_dictionary["zs"],s=25, depthshade=False,
                                     marker="o", c=color)
-                    self.correct_lims([object_dictionary["xs"]],[object_dictionary["ys"]],[object_dictionary["zs"]], sequence_manager)
+                    sequence_manager.correct_lims([object_dictionary["xs"]],[object_dictionary["ys"]],[object_dictionary["zs"]])
+    
     def standard_view(self):
         self.plot.azim=-60
         self.plot.elev=30
@@ -86,8 +87,8 @@ class Plot3D:
                     self.plot.add_collection3d(dict_elem["line_collection"])
     
                     #TODO:if not visible plot as squares
-                    self.correct_lims([dict_elem["min_lims"][0]],[dict_elem["min_lims"][1]],[dict_elem["min_lims"][2]], sequence_manager)
-                    self.correct_lims([dict_elem["max_lims"][0]],[dict_elem["max_lims"][1]],[dict_elem["max_lims"][2]], sequence_manager)
+                    sequence_manager.correct_lims([dict_elem["min_lims"][0]],[dict_elem["min_lims"][1]],[dict_elem["min_lims"][2]])
+                    sequence_manager.correct_lims([dict_elem["max_lims"][0]],[dict_elem["max_lims"][1]],[dict_elem["max_lims"][2]])
                 else:
                     self.plot.scatter(xs=dict_elem["xs"],
                             ys=dict_elem["ys"],
@@ -96,10 +97,10 @@ class Plot3D:
                             s=5,
                             c=dict_elem["color"],
                             marker="o")
-                    self.correct_lims(dict_elem["xs"],dict_elem["ys"],dict_elem["zs"], sequence_manager)
+                    sequence_manager.correct_lims(dict_elem["xs"],dict_elem["ys"],dict_elem["zs"])
         #TODO:if line collection to small other kind of plotting
         #if self.width_x/ax_width<is_visible_factor \
-        #self.plot.set_xlim()
+
     def set_plot_lims(self,sequence_manager):
         if sequence_manager.min_lim is not None and sequence_manager.max_lim is not None:
             self.plot.set_xlim(sequence_manager.min_lim[0],sequence_manager.max_lim[0])
@@ -107,24 +108,4 @@ class Plot3D:
             self.plot.set_zlim(sequence_manager.min_lim[2],sequence_manager.max_lim[2])
 
 
-    def correct_lims(self,xs,ys,zs, sequence_manager):
-        sequence_manager.min_lim=compare_and_get(sequence_manager.min_lim,xs,ys,zs,greater)
-        sequence_manager.max_lim=compare_and_get(sequence_manager.max_lim,xs,ys,zs,less)
 
-def compare_and_get(ref,xs,ys,zs,comparator):
-    for i in range(len(xs)):
-        if ref is None:
-            ref=[xs[i],ys[i],zs[i]]
-        if comparator(ref[0] , xs[i]):
-            ref[0]=xs[i]
-        if comparator(ref[1] , ys[i]):
-            ref[1]=ys[i]
-        if comparator(ref[2] , zs[i]):
-            ref[2]=zs[i]
-    return ref
-
-def less(a,b):
-    return a<b
-
-def greater(a,b):
-    return a>b

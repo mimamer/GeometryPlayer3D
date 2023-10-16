@@ -20,18 +20,23 @@ class GeometryPlayer3D:
         self.original_timeout=500
         self.plot_3d:Plot3D=Plot3D()
         self.plot_distance: PlotDistance=PlotDistance()
-
+        max_range=100
         self.sequence_manager:SequenceManager=SequenceManager(None)
+        playback_slider=PySimpleGUI.Slider(range=(1,max_range),tooltip="Play Slider", key="playback slider",expand_x=True,enable_events=True, default_value=max_range/2, orientation='horizontal')
+        window_length_slider=PySimpleGUI.Slider(range=(1,max_range),tooltip="Window Length", key="window length",expand_x=False,enable_events=True, default_value=self.sequence_manager.length_plot_window, orientation='horizontal')
+
+        
         self.event_binder:EventBinder=EventBinder(self.plot_3d, self.sequence_manager)
 
-        PySimpleGUI.theme('SystemDefault')
+        #PySimpleGUI.theme('SystemDefault')
         
-        self.root = PySimpleGUI.Window(title="3D Result Player",
+        self.root = PySimpleGUI.Window(title="Geometry Player 3D",
                         layout=[
                             [PySimpleGUI.FileBrowse("Open Sequence",enable_events=True)],
                             [PySimpleGUI.Canvas(key="-CANVAS-3D")],
                             [PySimpleGUI.Canvas(key="-CANVAS-DISTANCE")],
-                            [self.event_binder.get_button_list_bottom()]
+                            [playback_slider, window_length_slider],
+                            [self.event_binder.get_button_list_bottom()],
                         ],
                         finalize=True,element_justification='c', resizable=True)
         self.plot_3d.set_root(self.root)
@@ -111,6 +116,12 @@ class GeometryPlayer3D:
                 break
             if event=="Open Sequence" and values["Open Sequence"] is not None:
                 self.trigger_open(values['Open Sequence'])
+            if event=="window length" and values["window length"] is not None:
+                self.sequence_manager.length_plot_window=int(values["window length"])
+                self.sequence_manager.set_plot_data_regarding_tmp_index()
+                self.update_plot()
+            #TODO: include playback slider...
+
             self.trigger_events(event)
             if self.switch:
                 self.run_figure()

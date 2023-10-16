@@ -15,13 +15,16 @@ class Sequence:
         self.color=color
         self.representative_color=self.color[int(len(self.color)/2)]
 
-    def reset_to_actual_points(self,tmp_index):
+    def reset_to_actual_points(self,tmp_index, window_length):
+        if window_length>=tmp_index:
+            window_length=tmp_index
+
         if tmp_index>=len(self.data_objects):
-            self.plot_data=self.data_objects[:len(self.data_objects)]
-            self.scope= [i for i in range(len(self.data_objects))]
+            self.plot_data=self.data_objects[tmp_index-window_length:len(self.data_objects)]
+            self.scope= [i for i in range(tmp_index-window_length,len(self.data_objects))]
         else:
-            self.plot_data=self.data_objects[:tmp_index]
-            self.scope=[i for i in range(tmp_index)]
+            self.plot_data=self.data_objects[tmp_index-window_length:tmp_index]
+            self.scope=[i for i in range(tmp_index-window_length,tmp_index)]
 
     def plot_sequence_data(self,color, jump_over_object=None):#TODO:shorter?
         #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points

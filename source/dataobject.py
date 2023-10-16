@@ -13,12 +13,16 @@ class DataObject:
         self.width_x=0
         self.height_y=0
         self.depth_z=0
+        self.min_lim=None
+        self.max_lim=None
         factor=0.01 #TODO: only for testing, is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
         if len(data)!=1:
             self.is_vertex=False
         self.data=None
         if self.is_vertex:
             self.data=numpy.array(data[0]) #is list of three numbers
+            self.min_lim=[self.data[0], self.data[1],self.data[2]]
+            self.max_lim=self.min_lim
         else:
             try:
                 segments=[(
