@@ -31,16 +31,16 @@ class DataObject:
                 print(e)
     
     def get_dimensions(self):#TODO:naming?etc
-        self.min_lims=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
-        self.max_lims=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
+        self.min_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
+        self.max_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         for segment in self.data:
             for index in range(len(segment)):
-                for axis in range(len(self.min_lims)):
-                    if self.min_lims[axis] > segment[index][axis]:
-                        self.min_lims[axis]=segment[index][axis]
-                    if self.max_lims[axis] < segment[index][axis]:
-                       self.max_lims[axis]=segment[index][axis]
-        return self.max_lims[0]-self.min_lims[0],self.max_lims[1]-self.min_lims[1],self.max_lims[2]-self.min_lims[2]
+                for axis in range(len(self.min_lim)):
+                    if self.min_lim[axis] > segment[index][axis]:
+                        self.min_lim[axis]=segment[index][axis]
+                    if self.max_lim[axis] < segment[index][axis]:
+                       self.max_lim[axis]=segment[index][axis]
+        return self.max_lim[0]-self.min_lim[0],self.max_lim[1]-self.min_lim[1],self.max_lim[2]-self.min_lim[2]
 
 
     def get_plot_data_object(self,color) -> dict:
@@ -51,27 +51,12 @@ class DataObject:
                     "color":color}
         else:
             return {"line_collection":Line3DCollection(self.data,edgecolor=color),
-                    "min_lims":self.min_lims,
-                    "max_lims":self.max_lims,
+                    "min_lims":self.min_lim,
+                    "max_lims":self.max_lim,
                     "width_x": self.width_x,
                     "height_y": self.height_y,
                     "depth_z": self.depth_z}
 
-    def widening_ax_lims(self,ax):# only widening, TODO:delete
-        if ax.get_xlim()[0] > self.min_lims[0]:
-            ax.set_xlim((self.min_lims[0],ax.get_xlim()[1]))
-        if ax.get_xlim()[1] < self.max_lims[0]:
-            ax.set_xlim((ax.get_xlim()[0],self.max_lims[0]))
-
-        if ax.get_ylim()[0] > self.min_lims[1]:
-            ax.set_ylim((self.min_lims[1],ax.get_ylim()[1]))
-        if ax.get_ylim()[1] < self.max_lims[1]:
-            ax.set_ylim((ax.get_ylim()[0],self.max_lims[1]))
-
-        if ax.get_zlim()[0] > self.min_lims[2]:
-            ax.set_zlim((self.min_lims[2],ax.get_zlim()[1]))
-        if ax.get_zlim()[1] < self.max_lims[2]:
-            ax.set_zlim((ax.get_zlim()[0],self.max_lims[2]))
 
 def square_distance_between(object_a:DataObject,object_b:DataObject):
     if object_a.is_vertex and object_b.is_vertex:

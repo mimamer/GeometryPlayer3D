@@ -11,6 +11,8 @@ class SequenceManager:
         self.tmp_index=0
         self.total_index=0
         self.zoom_factor=0
+        self.min_lim=None
+        self.max_lim=None
         
         if input_sequences is None:
             self.sequences=[]
@@ -91,7 +93,8 @@ class SequenceManager:
         for sequence in self.sequences:
             if sequence.is_empty():
                 empty+=1
-        if empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1:
+        if (empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1) \
+            or (self.min_lim==self.chosen_data_object.min_lim and self.max_lim==self.chosen_data_object.max_lim):#TODO:not enough if second sequence object in chosen_object
             return
 
         sq_dist_values=[]
@@ -145,6 +148,8 @@ class SequenceManager:
         return 0
 
     def set_plot_data_regarding_tmp_index(self):
+        self.min_lim=None
+        self.max_lim=None
         for sequence in self.sequences:
             sequence.reset_to_actual_points(self.tmp_index)
 
@@ -215,6 +220,8 @@ class SequenceManager:
                     result.append(sequence.plot_sequence_data(self.colors[index], self.chosen_data_object))
             elif sequence==self.hover_sequence:
                 result.append(sequence.plot_sequence_data(self.colors[index], self.hover_data_object))
+            else:
+                result.append(sequence.plot_sequence_data(self.colors[index]))
         return result
 
     def compute_dist_lines(self):

@@ -32,7 +32,7 @@ class EventBinder:
         return PySimpleGUI.ButtonMenu('Reset View',
                     [names,
                     names],
-                    border_width=2),button_menu_events#,background_color="gray"
+                    border_width=2, key='Reset View'),button_menu_events#,background_color="gray"
     
     def register_playback_speed_events(self) -> None:
         button_menu_events=[
@@ -45,7 +45,7 @@ class EventBinder:
         return PySimpleGUI.ButtonMenu('Playback Speed',
                     [names,
                     names],
-                    border_width=2),button_menu_events#,background_color="gray"
+                    border_width=2, key="Playback Speed"),button_menu_events#,background_color="gray"
     
     def register_button_events(self,sequence_manager:SequenceManager):
         events=[

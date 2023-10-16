@@ -101,12 +101,12 @@ class GeometryPlayer3D:
     def main_loop(self) -> None:
         while True:
             event, values = self.root.read(timeout=self.timeout)
-            #if event!="__TIMEOUT__":
-            #    print(event, values)
-            if values is not None and 0 in values.keys() and event==0:#button menu was triggered
-                self.trigger_view_menu_events(values[0])
-            if values is not None and 1 in values.keys() and event==1:#playback menu was triggered
-                self.trigger_playback_menu_events(values[1])
+            if event!="__TIMEOUT__":
+                print(event, values)
+            if event=='Reset View':
+                self.trigger_view_menu_events(values['Reset View'])
+            if event=='Playback Speed':
+                self.trigger_playback_menu_events(values['Playback Speed'])
             if event == PySimpleGUI.WIN_CLOSED or event=="Exit":
                 break
             if event=="Open Sequence" and values["Open Sequence"] is not None:
