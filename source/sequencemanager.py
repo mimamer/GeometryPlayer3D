@@ -81,6 +81,7 @@ class SequenceManager:
     def zoom_reset(self):
         if self.zoom_factor==0 or self.is_empty_plot() or self.chosen_data_object is None:
             return
+        self.zoom_factor=0
         self.set_plot_data_regarding_tmp_index()
 
     
