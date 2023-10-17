@@ -12,7 +12,7 @@ class SequenceManager:
         self.tmp_index=0
         self.total_index=0
         self.zoom_factor=0
-        self.limits=Limit()
+        self.limit=Limit()
         
         if input_sequences is None:
             self.sequences=[]
@@ -95,7 +95,7 @@ class SequenceManager:
             if sequence.is_empty():
                 empty+=1
         if (empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1) \
-            or (self.limits._min_lim==self.chosen_data_object.min_lim and self.limits._max_lim==self.chosen_data_object.max_lim):#TODO:not enough if second sequence object in chosen_object
+            or (self.limit.get_min()==self.chosen_data_object.limit.get_min() and self.limit.get_max()==self.chosen_data_object.limit.get_max()):#TODO:not enough if second sequence object in chosen_object
             return
 
         sq_dist_values=[]
@@ -149,7 +149,7 @@ class SequenceManager:
         return 0
 
     def set_plot_data_regarding_tmp_index(self):
-        self.limits.reset()
+        self.limit.reset()
         for sequence in self.sequences:
             sequence.reset_to_actual_points(self.tmp_index, self.length_plot_window)
 
@@ -208,10 +208,10 @@ class SequenceManager:
             self.hover_index=index
      
     def get_plot_data_3d(self):
-        
         if self.is_empty_plot():
             return
         result=[]
+        self.limit.reset()
         for index in range(len(self.sequences)):
             sequence=self.sequences[index]
             if sequence==self.chosen_sequence:
@@ -223,8 +223,7 @@ class SequenceManager:
                 result.append(sequence.plot_sequence_data( self.hover_data_object))
             else:
                 result.append(sequence.plot_sequence_data())
-            self.limits.reset()
-            self.limits.correct_limits_limit(sequence.limit)#TODO:plot_sequence_data refresh the limits, this is too hidden, rename function
+            self.limit.correct_limits_limit(sequence.limit)#TODO:plot_sequence_data refresh the limits, this is too hidden, rename function
         return result
 
     def compute_dist_lines(self):

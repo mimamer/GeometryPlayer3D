@@ -14,6 +14,9 @@ class Limit():
         self._min_lim=compare_and_get(self._min_lim,xs,ys,zs,greater)
         self._max_lim=compare_and_get(self._max_lim,xs,ys,zs,less)
     
+    def correct_limits_values(self,x,y,z):
+        self.correct_limits_lists([x],[y],[z])
+    
     def correct_limits_dictionary(self,dictionary:dict):
         self._min_lim=compare_and_get(self._min_lim,[dictionary["min_lim"][0]],[dictionary["min_lim"][1]],[dictionary["min_lim"][2]],greater)
         self._max_lim=compare_and_get(self._max_lim,[dictionary["max_lim"][0]],[dictionary["max_lim"][1]],[dictionary["max_lim"][2]],less)

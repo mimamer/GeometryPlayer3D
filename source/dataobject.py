@@ -1,6 +1,7 @@
 import mpl_toolkits
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import numpy
+from source.limit import Limit
 
 is_visible_factor=0.01
 data_object_counter=0
@@ -13,16 +14,14 @@ class DataObject:
         self.width_x=0
         self.height_y=0
         self.depth_z=0
-        self.min_lim=None
-        self.max_lim=None
+        self.limit=Limit()
         factor=0.01 #TODO: only for testing, is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
         if len(data)!=1:
             self.is_vertex=False
         self.data=None
         if self.is_vertex:
             self.data=numpy.array(data[0]) #is list of three numbers
-            self.min_lim=[self.data[0], self.data[1],self.data[2]]
-            self.max_lim=self.min_lim
+            self.limit.correct_limits_values(self.data[0], self.data[1],self.data[2])
         else:
             try:
                 segments=[(
@@ -35,16 +34,13 @@ class DataObject:
                 print(e)
     
     def get_dimensions(self):#TODO:naming?etc, refactor with Limit class
-        self.min_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
-        self.max_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         for segment in self.data:
             for index in range(len(segment)):
-                for axis in range(len(self.min_lim)):
-                    if self.min_lim[axis] > segment[index][axis]:
-                        self.min_lim[axis]=segment[index][axis]
-                    if self.max_lim[axis] < segment[index][axis]:
-                       self.max_lim[axis]=segment[index][axis]
-        return self.max_lim[0]-self.min_lim[0],self.max_lim[1]-self.min_lim[1],self.max_lim[2]-self.min_lim[2]
+                self.limit.correct_limits_values(segment[index][0], segment[index][1],segment[index][2])
+        min_lim=self.limit.get_min()
+        max_lim=self.limit.get_max()
+
+        return max_lim[0]-min_lim[0],max_lim[1]-min_lim[1],max_lim[2]-min_lim[2]
 
 
     def get_plot_data_object(self,color='yellow') -> dict:
@@ -55,8 +51,8 @@ class DataObject:
                     "color":color}
         else:
             return {"line_collection":Line3DCollection(self.data,edgecolor=color),
-                    "min_lim":self.min_lim,
-                    "max_lim":self.max_lim,
+                    "min_lim":self.limit.get_min(),
+                    "max_lim":self.limit.get_max(),
                     "width_x": self.width_x,
                     "height_y": self.height_y,
                     "depth_z": self.depth_z}

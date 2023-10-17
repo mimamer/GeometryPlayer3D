@@ -43,7 +43,7 @@ class Sequence:
             if self.plot_data[index] in jump_over_object:
                 object_dict=self.plot_data[index].get_plot_data_object()
                 if  self.plot_data[index].is_vertex:
-                    self.limit.correct_limits_lists([object_dict["x"]],[object_dict["y"]],[object_dict["z"]])
+                    self.limit.correct_limits_values(object_dict["x"],object_dict["y"],object_dict["z"])
                 else:
                     self.limit.correct_limits_dictionary(object_dict)
                 index+=1

@@ -30,7 +30,7 @@ class Plot3D:
             hover_dict=sequence_manager.get_hover_data_object_3d()
             self.handle_single_object(hover_dict,'aqua')
 
-        self.set_plot_lims(sequence_manager.limits)
+        self.set_plot_lims(sequence_manager.limit)
         self.set_default_plot_labels(sequence_manager.get_sequence_names(),sequence_manager.get_sequence_representative_colors())
         self.canvas.draw_idle()
         self.canvas.flush_events()
@@ -93,7 +93,6 @@ class Plot3D:
     def set_plot_lims(self,limit:Limit):
         min_lim=limit.get_min()
         max_lim=limit.get_max()
-        print("Gefundene Grenzen",min_lim,max_lim)
         if min_lim is not None and max_lim is not None:
             self.plot.set_xlim(min_lim[0],max_lim[0])
             self.plot.set_ylim(min_lim[1],max_lim[1])
