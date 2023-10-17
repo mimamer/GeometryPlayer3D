@@ -1,6 +1,7 @@
 from source.sequence import Sequence
 from matplotlib.lines import Line2D
 import math
+from source.limit import Limit
 from source.dataobject import square_distance_between
 from source.utils import create_colors
 from matplotlib.backend_bases import MouseButton
@@ -11,8 +12,7 @@ class SequenceManager:
         self.tmp_index=0
         self.total_index=0
         self.zoom_factor=0
-        self.min_lim=None
-        self.max_lim=None
+        self.limits=Limit()
         
         if input_sequences is None:
             self.sequences=[]
@@ -95,7 +95,7 @@ class SequenceManager:
             if sequence.is_empty():
                 empty+=1
         if (empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1) \
-            or (self.min_lim==self.chosen_data_object.min_lim and self.max_lim==self.chosen_data_object.max_lim):#TODO:not enough if second sequence object in chosen_object
+            or (self.limits._min_lim==self.chosen_data_object.min_lim and self.limits._max_lim==self.chosen_data_object.max_lim):#TODO:not enough if second sequence object in chosen_object
             return
 
         sq_dist_values=[]
@@ -149,8 +149,7 @@ class SequenceManager:
         return 0
 
     def set_plot_data_regarding_tmp_index(self):
-        self.min_lim=None
-        self.max_lim=None
+        self.limits.reset()
         for sequence in self.sequences:
             sequence.reset_to_actual_points(self.tmp_index, self.length_plot_window)
 
@@ -209,6 +208,7 @@ class SequenceManager:
             self.hover_index=index
      
     def get_plot_data_3d(self):
+        
         if self.is_empty_plot():
             return
         result=[]
@@ -223,6 +223,8 @@ class SequenceManager:
                 result.append(sequence.plot_sequence_data( self.hover_data_object))
             else:
                 result.append(sequence.plot_sequence_data())
+            self.limits.reset()
+            self.limits.correct_limits_limit(sequence.limit)#TODO:plot_sequence_data refresh the limits, this is too hidden, rename function
         return result
 
     def compute_dist_lines(self):
@@ -295,26 +297,3 @@ class SequenceManager:
                 if self.tmp_index>self.total_index:
                     self.addable_points-=self.add_point()
         self.set_plot_data_regarding_tmp_index()
-
-    def correct_lims(self,xs,ys,zs):
-        self.min_lim=compare_and_get(self.min_lim,xs,ys,zs,greater)
-        self.max_lim=compare_and_get(self.max_lim,xs,ys,zs,less)
-
-
-def compare_and_get(ref,xs,ys,zs,comparator):
-    for i in range(len(xs)):
-        if ref is None:
-            ref=[xs[i],ys[i],zs[i]]
-        if comparator(ref[0] , xs[i]):
-            ref[0]=xs[i]
-        if comparator(ref[1] , ys[i]):
-            ref[1]=ys[i]
-        if comparator(ref[2] , zs[i]):
-            ref[2]=zs[i]
-    return ref
-
-def less(a,b):
-    return a<b
-
-def greater(a,b):
-    return a>b

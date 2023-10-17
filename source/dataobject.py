@@ -34,7 +34,7 @@ class DataObject:
             except Exception as e:
                 print(e)
     
-    def get_dimensions(self):#TODO:naming?etc
+    def get_dimensions(self):#TODO:naming?etc, refactor with Limit class
         self.min_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         self.max_lim=[self.data[0][0][0],self.data[0][0][1],self.data[0][0][2]]
         for segment in self.data:
@@ -47,16 +47,16 @@ class DataObject:
         return self.max_lim[0]-self.min_lim[0],self.max_lim[1]-self.min_lim[1],self.max_lim[2]-self.min_lim[2]
 
 
-    def get_plot_data_object(self,color) -> dict:
+    def get_plot_data_object(self,color='yellow') -> dict:
         if self.is_vertex:
-            return {"xs":self.data[0],
-                    "ys": self.data[1],
-                    "zs": self.data[2],
+            return {"x":self.data[0],
+                    "y": self.data[1],
+                    "z": self.data[2],
                     "color":color}
         else:
             return {"line_collection":Line3DCollection(self.data,edgecolor=color),
-                    "min_lims":self.min_lim,
-                    "max_lims":self.max_lim,
+                    "min_lim":self.min_lim,
+                    "max_lim":self.max_lim,
                     "width_x": self.width_x,
                     "height_y": self.height_y,
                     "depth_z": self.depth_z}

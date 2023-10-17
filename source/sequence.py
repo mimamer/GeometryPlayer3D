@@ -1,5 +1,6 @@
 from source.dataobject import square_distance_between
 from source.dataobject import DataObject
+from source.limit import Limit
 import math
 
 class Sequence:
@@ -13,6 +14,7 @@ class Sequence:
         self.scope=[]
         self.name=name
         self.color=color
+        self.limit=Limit()
         self.representative_color=self.color[int(len(self.color)/2)]
 
     def reset_to_actual_points(self,tmp_index, window_length):
@@ -28,6 +30,7 @@ class Sequence:
 
     def plot_sequence_data(self, jump_over_object=None):#TODO:shorter?
         #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
+        self.limit.reset()
         actual_point_list_x=[]
         actual_point_list_y=[]
         actual_point_list_z=[]
@@ -38,6 +41,11 @@ class Sequence:
             jump_over_object=[jump_over_object]
         while index<len(self.plot_data):#TODO:color is changing, is this good? -> not when zooming (mehr als eine Zusammenhangskomponente)
             if self.plot_data[index] in jump_over_object:
+                object_dict=self.plot_data[index].get_plot_data_object()
+                if  self.plot_data[index].is_vertex:
+                    self.limit.correct_limits_lists([object_dict["x"]],[object_dict["y"]],[object_dict["z"]])
+                else:
+                    self.limit.correct_limits_dictionary(object_dict)
                 index+=1
                 continue
             if self.plot_data[index].is_vertex:
@@ -46,6 +54,7 @@ class Sequence:
                 actual_point_list_z.append(self.plot_data[index].data[2])
             else:#LineCollection3D
                 if len(actual_point_list_x)>0:
+                    self.limit.correct_limits_lists(actual_point_list_x,actual_point_list_y,actual_point_list_z)
                     zws_dict={"xs":actual_point_list_x,
                             "ys": actual_point_list_y,
                             "zs": actual_point_list_z,
@@ -55,14 +64,18 @@ class Sequence:
                     actual_point_list_y=[]
                     actual_point_list_z=[]
                 start_list_index=index+1
-                result_list.append(self.plot_data[index].get_plot_data_object(self.color[index]))
+                volume_object=self.plot_data[index].get_plot_data_object(self.color[index])
+                result_list.append(volume_object)
+                self.limit.correct_limits_dictionary(volume_object)
             index+=1
         if len(actual_point_list_x)>0:
+            self.limit.correct_limits_lists(actual_point_list_x,actual_point_list_y,actual_point_list_z)
             zws_dict={"xs":actual_point_list_x,
                     "ys": actual_point_list_y,
                     "zs": actual_point_list_z,
                     "color": self.color[start_list_index:start_list_index+len(actual_point_list_x)]}
             result_list.append(zws_dict)
+        print("Sequence Limits", self.limit.get_min(),self.limit.get_max())
         return result_list
 
     def get_plot_sequence_distance_data(self, chosen_sequence):#TODO:generate values before, more getting 
