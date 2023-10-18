@@ -3,6 +3,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from source.sequencemanager import SequenceManager
 import mpl_toolkits
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
+from matplotlib.patches import Patch
 from source.limit import Limit
 px=1/plt.rcParams['figure.dpi']#TODO:magic
 resolution=(1980*px,1080*px)
@@ -24,7 +25,7 @@ class Plot3D:
         self.plot.cla()
         if not sequence_manager.is_empty_plot():
             plot_data_3d=sequence_manager.get_plot_data_3d()
-            self.handle_plot_data(plot_data_3d,sequence_manager)
+            self.handle_plot_data(plot_data_3d,sequence_manager.limit)
             chosen_dict=sequence_manager.get_chosen_data_object_3d()
             self.handle_single_object(chosen_dict,'fuchsia')
             hover_dict=sequence_manager.get_hover_data_object_3d()
@@ -70,11 +71,10 @@ class Plot3D:
         self.plot.set_ylabel("y")
         self.plot.set_zlabel("z")
         if legend_names is not None and legend_colors is not None:
-            self.plot.legend(labels=legend_names, labelcolor=legend_colors)
+            patches=[Patch(color=legend_colors[i], label=legend_names[i]) for i in range(len(legend_names))]
+            self.plot.legend(handles=patches)
 
-    def handle_plot_data(self, plot_data_3d,sequence_manager):#TODO:visible stuff
-        sequence_manager.min_lim=None
-        sequence_manager.max_lim=None
+    def handle_plot_data(self, plot_data_3d,limit):#TODO:visible stuff via limit
         for sequence in plot_data_3d:
             for dict_elem in sequence:
                 if "line_collection" in dict_elem.keys():

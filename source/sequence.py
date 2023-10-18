@@ -20,8 +20,11 @@ class Sequence:
     def reset_to_actual_points(self,tmp_index, window_length):
         if window_length>=tmp_index:
             window_length=tmp_index
-
         if tmp_index>=len(self.data_objects):
+            while tmp_index>=len(self.data_objects):
+                if len(self.data_objects)==self.total_length:
+                    break
+                self.add_point()
             self.plot_data=self.data_objects[tmp_index-window_length:len(self.data_objects)]
             self.scope= [i for i in range(tmp_index-window_length,len(self.data_objects))]
         else:

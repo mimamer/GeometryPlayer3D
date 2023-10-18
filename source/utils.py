@@ -41,19 +41,20 @@ def open_dataobjects_test_data():
 #        data.append(data_object)
 #    return data
 
-
-def create_colors(length_plot_window):
-    colors=[]
-    for cmap in ['Greys','Greens','Purples','Oranges', 'Blues']:
-        cmap=plt.get_cmap(cmap)
-        colo=[]
-        cmap_usable=int(cmap.N/3)
-        col_abs=(cmap.N-cmap_usable)/length_plot_window #TODO: hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
-        i=0
-        while i*col_abs<=cmap.N-cmap_usable:
-            rgba=cmap(cmap_usable+int(i*col_abs))
-            colo.append(matplotlib.colors.rgb2hex(rgba))
-            i+=1
-        colors.append(colo)
-    return colors
+color_mod=0
+def create_color(length_plot_window):
+    global color_mod
+    cmaps=['Greys','Greens','Purples','Oranges', 'Blues']
+    cmap =cmaps[color_mod%len(cmaps)]
+    color_mod+=1
+    cmap=plt.get_cmap(cmap)
+    colo=[]
+    cmap_usable=int(cmap.N/3)
+    col_abs=(cmap.N-cmap_usable)/length_plot_window #TODO: hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
+    i=0
+    while i*col_abs<=cmap.N-cmap_usable:
+        rgba=cmap(cmap_usable+int(i*col_abs))
+        colo.append(matplotlib.colors.rgb2hex(rgba))
+        i+=1
+    return colo
 

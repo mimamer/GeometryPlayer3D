@@ -20,9 +20,10 @@ class GeometryPlayer3D:
         self.original_timeout=500
         self.plot_3d:Plot3D=Plot3D()
         self.plot_distance: PlotDistance=PlotDistance()
-        max_range=100
+        
         self.sequence_manager:SequenceManager=SequenceManager(None)
-        playback_slider=PySimpleGUI.Slider(range=(1,max_range),tooltip="Play Slider", key="playback slider",expand_x=True,enable_events=True, default_value=max_range/2, orientation='horizontal')
+        max_range=self.sequence_manager.max_range+1
+        playback_slider=PySimpleGUI.Slider(range=(0,max_range-1),tooltip="Play Slider", key="playback slider",expand_x=True,enable_events=True, default_value=1, orientation='horizontal')
         window_length_slider=PySimpleGUI.Slider(range=(1,max_range),tooltip="Window Length", key="window length",expand_x=False,enable_events=True, default_value=self.sequence_manager.length_plot_window, orientation='horizontal')
 
         
@@ -39,6 +40,8 @@ class GeometryPlayer3D:
                             [self.event_binder.get_button_list_bottom()],
                         ],
                         finalize=True,element_justification='c', resizable=True)
+        window_length_slider.bind('<ButtonRelease-1>', ' Release')
+        playback_slider.bind('<ButtonRelease-1>', ' Release')
         self.plot_3d.set_root(self.root)
         self.plot_distance.set_root(self.root)
 
@@ -47,6 +50,8 @@ class GeometryPlayer3D:
     def update_plot(self) -> None:
         self.plot_3d.update(self.sequence_manager)
         self.plot_distance.update(self.sequence_manager)
+        playback_slider=self.root["playback slider"]
+        playback_slider.Update(value=self.sequence_manager.tmp_index)
 
     def run_figure(self) -> None:
         if self.switch:
@@ -81,6 +86,10 @@ class GeometryPlayer3D:
         except Exception as e:
             print(e)
             pass
+        window_slider=self.root["window length"]
+        window_slider.Update(range=(1,self.sequence_manager.max_range))
+        playback_slider=self.root["playback slider"]
+        playback_slider.Update(range=(0,self.sequence_manager.max_range))
         self.update_plot()
 
     def register_mouse_events(self) -> None:
@@ -116,11 +125,14 @@ class GeometryPlayer3D:
                 break
             if event=="Open Sequence" and values["Open Sequence"] is not None:
                 self.trigger_open(values['Open Sequence'])
-            if event=="window length" and values["window length"] is not None:
+            if event=="window length Release" and values["window length"] is not None:
                 self.sequence_manager.length_plot_window=int(values["window length"])
                 self.sequence_manager.set_plot_data_regarding_tmp_index()
                 self.update_plot()
-            #TODO: include playback slider...
+            if event=="playback slider Release" and values["playback slider"] is not None:
+                self.sequence_manager.tmp_index=int(values["playback slider"])
+                self.sequence_manager.set_plot_data_regarding_tmp_index()
+                self.update_plot()
 
             self.trigger_events(event)
             if self.switch:

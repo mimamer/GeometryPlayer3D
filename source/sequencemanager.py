@@ -3,7 +3,7 @@ from matplotlib.lines import Line2D
 import math
 from source.limit import Limit
 from source.dataobject import square_distance_between
-from source.utils import create_colors
+from source.utils import create_color
 from matplotlib.backend_bases import MouseButton
 import os.path
 
@@ -19,8 +19,8 @@ class SequenceManager:
         else:
             self.sequences=input_sequences
 
-        self.length_plot_window=10#TODO:only temporary
-        self.colors=create_colors(1000)#TODO:for every sequence, own length? generator?
+        self.max_range=1
+        self.length_plot_window=self.max_range
         self.finished_sequences=[]
         self.addable_points=len(self.sequences)
         #TODO:refactor this stuff, can I do better?
@@ -31,12 +31,13 @@ class SequenceManager:
 
     def add_sequence(self,data_objects,fname):
         sequence_name=os.path.basename(fname)
-        new_sequence=Sequence(data_objects,sequence_name,self.colors[len(self.sequences)])#TODO:here instead color generator next call
+        new_sequence=Sequence(data_objects,sequence_name,create_color(len(data_objects)))#TODO:here instead color generator next call
         if len(self.sequences)==0:
             self.chosen_sequence=new_sequence
             self.hover_sequence=new_sequence
         self.sequences.append(new_sequence)
         self.addable_points+=1
+        self.max_range=max(self.max_range,len(data_objects))
         self.catch_up(new_sequence, len(self.sequences)-1)
         self.set_plot_data_regarding_tmp_index()
         if len(self.sequences)==1:
@@ -186,7 +187,7 @@ class SequenceManager:
                 chosen_sequence=line
                 y_index_star=y_index
 
-        if min_dist is None or min_dist>=0.5:
+        if min_dist is None or min_dist>=1:
             return None,None
 
         if event.button==MouseButton.LEFT:
@@ -202,6 +203,7 @@ class SequenceManager:
             self.chosen_index=index_chosen
 
     def set_hover_object(self,hover_seq,index):
+
         if hover_seq is not None and index in hover_seq.scope:
             self.hover_sequence=hover_seq
             self.hover_data_object=self.hover_sequence.data_objects[index]
@@ -276,7 +278,9 @@ class SequenceManager:
 
     def get_hover_data_object_distance(self):
         if self.hover_data_object is not None:
-            if self.hover_index < self.chosen_sequence.total_length:
+            if self.hover_index in self.hover_sequence.scope:
+                if self.hover_index >=self.chosen_sequence.total_length:
+                    return self.hover_index,-1.0
                 return self.hover_index, \
                     math.sqrt(square_distance_between(self.chosen_sequence.data_objects[self.hover_index],self.hover_data_object))
             else:
