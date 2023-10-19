@@ -188,7 +188,7 @@ class SequenceManager:
                 y_index_star=y_index
 
         if min_dist is None or min_dist>=1:
-            return None,None
+            return
 
         if event.button==MouseButton.LEFT:
             self.zoom_reset()
@@ -203,8 +203,7 @@ class SequenceManager:
             self.chosen_index=index_chosen
 
     def set_hover_object(self,hover_seq,index):
-
-        if hover_seq is not None and index in hover_seq.scope:
+        if hover_seq is not None and index is not None:
             self.hover_sequence=hover_seq
             self.hover_data_object=self.hover_sequence.data_objects[index]
             self.hover_index=index
@@ -265,7 +264,7 @@ class SequenceManager:
         return self.dist_lines
 
     def get_chosen_data_object_3d(self):
-        if self.chosen_data_object is not None:
+        if self.chosen_data_object is not None and self.chosen_index in self.chosen_sequence.scope:
             return self.chosen_data_object.get_plot_data_object('fuchsia')
 
     def get_chosen_data_object_distance(self):
@@ -273,18 +272,16 @@ class SequenceManager:
             return self.chosen_index
 
     def get_hover_data_object_3d(self):
-          if self.hover_data_object is not None:
+          if self.hover_data_object is not None and self.hover_index in self.hover_sequence.scope:
             return self.hover_data_object.get_plot_data_object('aqua')
 
     def get_hover_data_object_distance(self):
         if self.hover_data_object is not None:
-            if self.hover_index in self.hover_sequence.scope:
-                if self.hover_index >=self.chosen_sequence.total_length:
-                    return self.hover_index,-1.0
-                return self.hover_index, \
-                    math.sqrt(square_distance_between(self.chosen_sequence.data_objects[self.hover_index],self.hover_data_object))
-            else:
-                return None, None
+            if self.hover_index >=self.chosen_sequence.total_length:
+                return self.hover_index,-1.0
+            return self.hover_index, \
+                math.sqrt(square_distance_between(self.chosen_sequence.data_objects[self.hover_index],self.hover_data_object))
+
         return None,None
 
     def jump_to_start(self):

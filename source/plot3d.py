@@ -5,6 +5,7 @@ import mpl_toolkits
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 from matplotlib.patches import Patch
 from source.limit import Limit
+import numpy
 px=1/plt.rcParams['figure.dpi']#TODO:magic
 resolution=(1980*px,1080*px)
 class Plot3D:
@@ -78,7 +79,20 @@ class Plot3D:
         for sequence in plot_data_3d:
             for dict_elem in sequence:
                 if "line_collection" in dict_elem.keys():
-                    self.plot.add_collection3d(dict_elem["line_collection"])
+                    max_lim=numpy.array(dict_elem["max_lim"])
+                    min_lim=numpy.array(dict_elem["min_lim"])
+                    limit_min=numpy.array(limit.get_min())
+                    limit_max=numpy.array(limit.get_max())
+                    if numpy.all(max_lim-min_lim<=(limit_max-limit_min)*0.01):
+                        self.plot.scatter(xs=min_lim[0],
+                            ys=min_lim[1],
+                            zs=min_lim[2],
+                            depthshade=False,
+                            s=5,
+                            c=dict_elem["color"],
+                            marker="s")
+                    else:
+                        self.plot.add_collection3d(dict_elem["line_collection"])
                 else:
                     self.plot.scatter(xs=dict_elem["xs"],
                             ys=dict_elem["ys"],
@@ -87,8 +101,6 @@ class Plot3D:
                             s=5,
                             c=dict_elem["color"],
                             marker="o")
-        #TODO:if line collection to small other kind of plotting
-        #if self.width_x/ax_width<is_visible_factor \
 
     def set_plot_lims(self,limit:Limit):
         min_lim=limit.get_min()
