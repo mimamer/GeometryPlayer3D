@@ -28,19 +28,19 @@ class Plot3D:
             plot_data_3d=sequence_manager.get_plot_data_3d()
             self.handle_plot_data(plot_data_3d,sequence_manager.limit)
             chosen_dict=sequence_manager.get_chosen_data_object_3d()
-            self.handle_single_object(chosen_dict,'fuchsia')
+            self.handle_single_object(chosen_dict,'fuchsia',sequence_manager.limit)
             hover_dict=sequence_manager.get_hover_data_object_3d()
-            self.handle_single_object(hover_dict,'aqua')
+            self.handle_single_object(hover_dict,'aqua',sequence_manager.limit)
 
         self.set_plot_lims(sequence_manager.limit)
         self.set_default_plot_labels(sequence_manager.get_sequence_names(),sequence_manager.get_sequence_representative_colors())
         self.canvas.draw_idle()
         self.canvas.flush_events()
 
-    def handle_single_object(self,object_dictionary,color:str):#TODO:usage sequence_manager.limit for right marker
+    def handle_single_object(self,object_dictionary,color:str, limit:Limit):
             if object_dictionary is not None: 
                 if "line_collection" in object_dictionary.keys():
-                    self.plot.add_collection3d(object_dictionary["line_collection"])#TODO:if line collection to small other kind of plotting
+                    self.handle_line_collection(object_dictionary,limit)
                 else:
                     self.plot.scatter(object_dictionary["x"],object_dictionary["y"],object_dictionary["z"],s=25, depthshade=False,
                                     marker="o", c=color)
@@ -75,24 +75,11 @@ class Plot3D:
             patches=[Patch(color=legend_colors[i], label=legend_names[i]) for i in range(len(legend_names))]
             self.plot.legend(handles=patches)
 
-    def handle_plot_data(self, plot_data_3d,limit):#TODO:visible stuff via limit
+    def handle_plot_data(self, plot_data_3d,limit):
         for sequence in plot_data_3d:
             for dict_elem in sequence:
                 if "line_collection" in dict_elem.keys():
-                    max_lim=numpy.array(dict_elem["max_lim"])
-                    min_lim=numpy.array(dict_elem["min_lim"])
-                    limit_min=numpy.array(limit.get_min())
-                    limit_max=numpy.array(limit.get_max())
-                    if numpy.all(max_lim-min_lim<=(limit_max-limit_min)*0.01):
-                        self.plot.scatter(xs=min_lim[0],
-                            ys=min_lim[1],
-                            zs=min_lim[2],
-                            depthshade=False,
-                            s=5,
-                            c=dict_elem["color"],
-                            marker="s")
-                    else:
-                        self.plot.add_collection3d(dict_elem["line_collection"])
+                    self.handle_line_collection(dict_elem,limit)
                 else:
                     self.plot.scatter(xs=dict_elem["xs"],
                             ys=dict_elem["ys"],
@@ -110,5 +97,19 @@ class Plot3D:
             self.plot.set_ylim(min_lim[1],max_lim[1])
             self.plot.set_zlim(min_lim[2],max_lim[2])
 
-
+    def handle_line_collection(self, dict_elem,limit):
+        max_lim=numpy.array(dict_elem["max_lim"])
+        min_lim=numpy.array(dict_elem["min_lim"])
+        limit_min=numpy.array(limit.get_min())
+        limit_max=numpy.array(limit.get_max())
+        if numpy.all(max_lim-min_lim<=(limit_max-limit_min)*0.01):
+            self.plot.scatter(xs=min_lim[0],
+                ys=min_lim[1],
+                zs=min_lim[2],
+                depthshade=False,
+                s=5,
+                c=dict_elem["color"],
+                marker="s")
+        else:
+            self.plot.add_collection3d(dict_elem["line_collection"])
 

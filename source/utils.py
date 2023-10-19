@@ -30,16 +30,6 @@ def open_dataobjects_test_data():
     data_objects=read_data(path)
     data_objects=data_objects['data']
     return data_objects
-#def open_dataobjects_minus():
-#    path="/home/michelle/real/3d_player/test_data/modified_meth0.txt"
-#    data_objects=read_data(path)
-#    data_objects=data_objects['data']
-#    data=[]
-#    for index in range(len(data_objects)):
-#        data_object=data_objects[index]
-#        data_object=[-1*data_object[0],-1*data_object[1],-1*data_object[2]]
-#        data.append(data_object)
-#    return data
 
 color_mod=0
 def create_color(length_plot_window):
@@ -50,7 +40,7 @@ def create_color(length_plot_window):
     cmap=plt.get_cmap(cmap)
     colo=[]
     cmap_usable=int(cmap.N/3)
-    col_abs=(cmap.N-cmap_usable)/length_plot_window #TODO: hier noch volles Fenster, dieses wird aber irgendwann verkleinert, schieberegler
+    col_abs=(cmap.N-cmap_usable)/length_plot_window 
     i=0
     while i*col_abs<=cmap.N-cmap_usable:
         rgba=cmap(cmap_usable+int(i*col_abs))

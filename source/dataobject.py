@@ -12,7 +12,6 @@ class DataObject:
         self.height_y=0
         self.depth_z=0
         self.limit=Limit()
-        factor=0.01 #TODO: only for testing, is ok #0.001 is nearly ok #0.0001too small already #0.00001 not visible
         if len(data)!=1:
             self.is_vertex=False
         self.data=None
@@ -22,8 +21,8 @@ class DataObject:
         else:
             try:
                 segments=[(
-                    numpy.array(data[index][0])*factor,
-                    numpy.array(data[index][1])*factor)
+                    numpy.array(data[index][0]),
+                    numpy.array(data[index][1]))
                     for index in range(len(data))]
                 self.data=segments
                 self.set_dimensions()

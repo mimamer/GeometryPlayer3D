@@ -1,5 +1,4 @@
 from source.sequence import Sequence
-from matplotlib.lines import Line2D
 import math
 from source.limit import Limit
 from source.dataobject import square_distance_between
@@ -31,7 +30,7 @@ class SequenceManager:
 
     def add_sequence(self,data_objects,fname):
         sequence_name=os.path.basename(fname)
-        new_sequence=Sequence(data_objects,sequence_name,create_color(len(data_objects)))#TODO:here instead color generator next call
+        new_sequence=Sequence(data_objects,sequence_name,create_color(len(data_objects)))
         if len(self.sequences)==0:
             self.chosen_sequence=new_sequence
             self.hover_sequence=new_sequence
@@ -85,18 +84,25 @@ class SequenceManager:
         self.zoom_factor=0
         self.set_plot_data_regarding_tmp_index()
 
-    
-    def zoom_in(self):#TODO:shorter
-        if self.is_empty_plot() or self.chosen_data_object is None:
-            return
-        # radial zoom (because it's instinctive),
-        # although it is possible to not show a border data point even if it would be in the cubic view
+    def zoomable(self):
+        if self.is_empty_plot() or self.chosen_data_object is None or \
+            self.chosen_index not in self.chosen_sequence.scope:
+            return False
         empty=0
         for sequence in self.sequences:
             if sequence.is_empty():
                 empty+=1
         if (empty==len(self.sequences)-1 and len(self.chosen_sequence.plot_data)==1) \
-            or (self.limit.get_min()==self.chosen_data_object.limit.get_min() and self.limit.get_max()==self.chosen_data_object.limit.get_max()):#TODO:not enough if second sequence object in chosen_object
+            or \
+            (self.limit.get_min()==self.chosen_data_object.limit.get_min() and \
+             self.limit.get_max()==self.chosen_data_object.limit.get_max()):
+            return False
+        return True
+
+    def zoom_in(self):#TODO:shorter
+        # radial zoom (because it's instinctive),
+        # although it is possible to not show a border data point even if it would be in the cubic view
+        if not self.zoomable():
             return
 
         sq_dist_values=[]
@@ -108,16 +114,11 @@ class SequenceManager:
             else:
                 sq_dist_values.append(-1)#default, since -1 is an impossible value
         max_value=max(sq_dist_values)
-        if self.hover_data_object is not None and self.hover_index not in self.hover_sequence.scope:
-            self.hover_data_object=None
-            self.hover_index=None
-            self.hover_sequence=None
 
         for index in range(len(self.sequences)):
             if not self.sequences[index].is_empty() and sq_dist_values[index]!=-1 and max_value==sq_dist_values[index]:
                 self.sequences[index].apply_sequence_delete_list()
         self.zoom_factor+=1
-
 
     def backwards(self):
         if self.tmp_index>0:
@@ -258,7 +259,6 @@ class SequenceManager:
                 print(e)
 
         return result
-
 
     def get_plot_distance_data(self):
         return self.dist_lines
