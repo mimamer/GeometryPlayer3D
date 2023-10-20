@@ -27,13 +27,23 @@ class Plot3D:
         if not sequence_manager.is_empty_plot():
             plot_data_3d=sequence_manager.get_plot_data_3d()
             self.handle_plot_data(plot_data_3d,sequence_manager.limit)
-            chosen_dict=sequence_manager.get_chosen_data_object_3d()
-            self.handle_single_object(chosen_dict,'fuchsia',sequence_manager.limit)
             hover_dict=sequence_manager.get_hover_data_object_3d()
             self.handle_single_object(hover_dict,'aqua',sequence_manager.limit)
+            chosen_dict=sequence_manager.get_chosen_data_object_3d()
+            self.handle_single_object(chosen_dict,'fuchsia',sequence_manager.limit)
+
 
         self.set_plot_lims(sequence_manager.limit)
-        self.set_default_plot_labels(sequence_manager.get_sequence_names(),sequence_manager.get_sequence_representative_colors())
+        chosen_name=None
+        hover_name=None
+        if sequence_manager.chosen_sequence is not None:
+            chosen_name=sequence_manager.chosen_sequence.name
+        if sequence_manager.hover_sequence is not None:
+            hover_name=sequence_manager.hover_sequence.name
+        self.set_default_plot_labels(sequence_manager.get_sequence_names(),
+                                     sequence_manager.get_sequence_representative_colors(),
+                                     chosen_name,
+                                     hover_name)
         self.canvas.draw_idle()
         self.canvas.flush_events()
 
@@ -67,13 +77,21 @@ class Plot3D:
         self.plot.azim=0
         self.plot.elev=-90
 
-    def set_default_plot_labels(self,legend_names=None, legend_colors=None) -> None:
+    def set_default_plot_labels(self,legend_names=None, legend_colors=None, chosen_name=None,hover_name=None) -> None:
         self.plot.set_xlabel("x")
         self.plot.set_ylabel("y")
         self.plot.set_zlabel("z")
         if legend_names is not None and legend_colors is not None:
-            patches=[Patch(color=legend_colors[i], label=legend_names[i]) for i in range(len(legend_names))]
-            self.plot.legend(handles=patches)
+            patches=[Patch(color=legend_colors[i]) for i in range(len(legend_names))]
+            legend_names_modified=list.copy(legend_names)
+            if chosen_name is not None or hover_name is not None:
+                for i in range(len(legend_names)):
+                    if chosen_name==legend_names[i]:
+                        legend_names_modified[i]+=" (I)"
+                    if hover_name==legend_names[i]:
+                        legend_names_modified[i]+=" (II)"
+        
+            self.plot.legend(handles=patches, labels=legend_names_modified)
 
     def handle_plot_data(self, plot_data_3d,limit):
         for sequence in plot_data_3d:

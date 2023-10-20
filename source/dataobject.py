@@ -3,8 +3,6 @@ from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import numpy
 from source.limit import Limit
 
-is_visible_factor=0.01
-
 class DataObject:
     def __init__(self,data):
         self.is_vertex=True
