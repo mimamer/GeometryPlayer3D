@@ -1,3 +1,5 @@
 matplotlib
 PySimpleGui
 path
+tk
+sphinx

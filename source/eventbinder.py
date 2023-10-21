@@ -15,7 +15,7 @@ class EventBinder:
         return self.button_list_bottom
     
     
-    def register_view_menu_events(self,plot_3d:Plot3D) -> None:
+    def register_view_menu_events(self,plot_3d:Plot3D) -> tuple[PySimpleGUI.ButtonMenu,list[ButtonEvent]]:
         button_menu_events=[
             ButtonEvent("standard view",plot_3d.standard_view),
             ButtonEvent("front view",plot_3d.front_view),
@@ -34,7 +34,7 @@ class EventBinder:
                     names],
                     border_width=2, key='Reset View'),button_menu_events
     
-    def register_playback_speed_events(self) -> None:
+    def register_playback_speed_events(self) -> tuple[PySimpleGUI.ButtonMenu,list[ButtonEvent]]: #TODO:check synatx
         button_menu_events=[
             ButtonEvent(str(step/100),self.dummy) for step in range(25,201,25)
         ]
@@ -52,7 +52,7 @@ class EventBinder:
             #ButtonEvent("Reset x",self.reset_x),
             ButtonEvent("\u23EE",sequence_manager.jump_to_start),
             ButtonEvent("\u23F4",sequence_manager.backwards),
-            ButtonEvent("\u23EF",self.dummy),
+            ButtonEvent("\u23EF",self.dummy),#TODO:more static...
             ButtonEvent("\u23F5",sequence_manager.forwards),
             ButtonEvent("\u23ED", sequence_manager.jump_to_end),
             ButtonEvent("+",sequence_manager.zoom_in),
@@ -64,5 +64,5 @@ class EventBinder:
             button_list.append(event.get_button())
         return button_list, events
 
-    def dummy():
+    def dummy(): #TODO:looks very static but is not?
         return

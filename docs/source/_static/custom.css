@@ -49,3 +49,45 @@ tt, code {
     color:  #eeeeee;
     padding: 1px 2px;
 }
+
+div.note{
+    background-color: #333333;
+}
+
+a.reference.internal:link {
+    color: #eeeeee;
+  }
+
+  a.reference.internal:visited {
+    color: #cfcfcf;
+  }
+  
+
+  a.reference.internal:hover {
+    color: #919191;
+  }
+  
+ 
+  a.reference.internal:active {
+    color: #919191;
+  }
+
+  code.docutils.literal.notranslate:hover{
+    background-color: #333333;
+  }
+
+a:link {
+    color: #eeeeee;
+}
+
+a:visited {
+    color: #cfcfcf;
+}
+  
+a:hover {
+    color: #919191;
+}
+  
+a:active {
+    color: #919191;
+}

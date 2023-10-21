@@ -51,6 +51,6 @@ Static Methods
 
 .. py:staticmethod:: dummy()
 
-    static dummy function. Does nothing, but is useful for 
-    special button events that need to be handled by 
+    Does nothing but is useful for 
+    special ButtonEvent elements that need to be handled by 
     the instance of GeometryPlayer3D directly.

@@ -80,9 +80,9 @@ class GeometryPlayer3D:
                 self.update_plot()
                 break
 
-    def trigger_open(self, fname):
+    def trigger_open(self, fname) -> None:
         try:
-            self.sequence_manager.add_sequence(open_dataobjects(fname),fname)
+            self.sequence_manager.add_sequence(open_dataobjects(fname),fname)#TODO:open in add_sequence to reduce arguments there
         except Exception as e:
             print(e)
             pass

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to GeometryPlayer3D's documentation!
+GeometryPlayer3D documentation
 ============================================
 **GeometryPlayer3D** is a 'Media' Player for sequence(s) of *3D Points* and *Line3DCollections*....
 
