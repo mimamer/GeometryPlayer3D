@@ -1,0 +1,51 @@
+/* This file intentionally left blank. */
+dt:target, .highlight {
+    background: #454545;
+}
+
+body{
+    background-color: #1c1c1c;
+}
+div.document{
+    margin: 30px;
+    background-color: #1c1c1c;
+    color: #eeeeee
+}
+
+div.footer{
+    background-color: #1c1c1c;
+    color: #eeeeee
+}
+
+div.body{
+    margin-left: 200px;
+    margin-right:300px;
+    min-width: 1000px;
+    max-width: 4000px;
+    background-color: #1c1c1c;
+    color: #eeeeee
+}
+
+div.head{
+    background-color: #1c1c1c;
+    color: #eeeeee
+}
+div.sphinxsidebar #searchbox input[type="text"] {
+    background-color: #333333;
+}
+div.sphinxsidebar a{
+    color:#eeeeee;
+}
+
+div.sphinxsidebar h3{
+    color:#eeeeee;
+}
+
+div.sphinxsidebar ul {
+    color: #eeeeee;
+}
+
+tt, code {
+    color:  #eeeeee;
+    padding: 1px 2px;
+}
