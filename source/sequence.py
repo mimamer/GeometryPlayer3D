@@ -32,7 +32,7 @@ class Sequence:
             self.scope=[i for i in range(tmp_index-window_length,tmp_index)]
 
     def plot_sequence_data(self, jump_over_object=None):#TODO:shorter?
-        #actual point lists for faster plotting, problems if these list cannot get long due to 'LineCollection3D's between points
+        #actual point lists for faster plotting, loss of efficiency if these list cannot get long due to 'LineCollection3D's between points
         self.limit.reset()
         actual_point_list_x=[]
         actual_point_list_y=[]
